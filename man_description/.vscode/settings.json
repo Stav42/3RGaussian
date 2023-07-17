@@ -1,0 +1,12 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/Users/stav.42/Dev/rbdl/build/python",
+        "/usr/local/lib/python3.9/site-packages",
+        ""
+    ],
+    "python.analysis.extraPaths": [
+        "/Users/stav.42/Dev/rbdl/build/python",
+        "/usr/local/lib/python3.9/site-packages",
+        ""
+    ]
+}

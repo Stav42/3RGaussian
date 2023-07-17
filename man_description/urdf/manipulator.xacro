@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+
+<robot name="3R" xmlns:xacro="http://www.ros.org/wiki/macro">
+
+    <xacro:macro name="m_link_cylinder" params="name origin_xyz origin_rpy radius length mass ixx ixy ixz iyy iyz izz">
+        <link name="${name}">
+            <visual>
+            <origin rpy= "${origin_rpy}" xyz="${origin_xyz}" />
+            <geometry>
+                <cylinder radius="${radius}" length="${length}"/>
+            </geometry>
+            </visual>
+            <inertial>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+                <mass value="${mass}"/>
+                <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}"/>
+            </inertial>
+            <collision>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+                <geometry>
+                    <cylinder radius="${radius}" length="${length}"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="m_trans" params="trans_name joint_name  motor_name">
+        <transmission name="${trans_name}">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="${joint_name}">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${motor_name}">
+                <mechanicalReduction>1.0</mechanicalReduction>
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+
+    <xacro:macro name="m_joint" params="name type axis_xyz origin_rpy origin_xyz parent child">
+        <joint name="${name}" type="${type}">
+        <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <axis xyz="${axis_xyz}"/>
+        <limit lower="-3.14" upper="3.14" effort="1000.0" velocity="0.5"/>
+        </joint>
+    </xacro:macro>
+
+    <link name="base_link">
+        <visual>
+            <origin rpy= "0 0 0" xyz="0 0 0" />
+            <geometry>
+                <box size="1 1 1"/>
+            </geometry>
+        </visual>
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <mass value="1024"/>
+            <inertia ixx="170.667" ixy="0.0" ixz="0.0" iyy="170.667" iyz="0.0" izz="170.667"/>
+        </inertial>
+        <collision>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="1 1 1"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <xacro:m_joint name="base_link_link_01" type="revolute" axis_xyz="0 0 1" origin_rpy="0 0 0" origin_xyz="0 0 0.5" parent="base_link" child="link_01"/>
+
+    <xacro:m_link_cylinder name="link_01" origin_rpy="0 0 0" origin_xyz="0 0 0.2" radius="0.35" length="0.4" mass="157.633" ixx="13.235" iyy="13.235" izz="9.655" ixy="0" ixz="0" iyz="0"/>
+
+    <xacro:m_joint name="link_01_link_02" type="revolute" axis_xyz="0 1 0" origin_rpy="0 0 0" origin_xyz="0 0 0.4" parent="link_01" child="link_02"/>
+
+    <xacro:m_link_cylinder name="link_02" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+
+    <xacro:m_joint name="link_02_link_03" type="revolute" axis_xyz="0 1 0" origin_rpy="0 0 0" origin_xyz="0 0 0.8" parent="link_02" child="link_03"/>
+        
+    <xacro:m_link_cylinder name="link_03" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+
+    <xacro:m_joint name="link_03_link_04" type="revolute" axis_xyz="0 0 1" origin_rpy="0 0 0" origin_xyz="0 0 0.8" parent="link_03" child="link_04"/>
+
+    <xacro:m_link_cylinder name="link_04" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+
+    <gazebo>
+        <plugin name="motor_control" filename="libmotor_plugin.dylib">
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <jointName>base_link_link_01</jointName>
+            <!-- <jointName>link_01_link_02</jointName> -->
+            <updateRate>50.0</updateRate> 
+            <alwaysOn>True</alwaysOn>
+        </plugin>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <!-- <jointName>base_link_link_01</jointName> -->
+            <jointName>link_01_link_02</jointName>
+            <updateRate>50.0</updateRate> 
+            <alwaysOn>True</alwaysOn>
+        </plugin>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <!-- <jointName>base_link_link_01</jointName> -->
+            <jointName>link_02_link_03</jointName>
+            <updateRate>50.0</updateRate> 
+            <alwaysOn>True</alwaysOn>
+        </plugin>
+    </gazebo>
+
+</robot>
