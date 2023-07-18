@@ -7,11 +7,24 @@ project(man_controller)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
 
+
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  roscpp
+  message_generation
+  std_msgs
 )
 
+add_message_files(
+  FILES
+  Traj.msg
+)
 
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -104,7 +117,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES man_description
-#  CATKIN_DEPENDS urdf
+ CATKIN_DEPENDS rospy roscpp std_msgs message_runtime
 #  DEPENDS system_lib
 )
 

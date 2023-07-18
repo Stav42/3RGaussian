@@ -13,6 +13,10 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
     private: ros::NodeHandle* rosNode;
     private: ros::Subscriber torque_sub;
+    private: physics::JointPtr joint1;
+    private: physics::JointPtr joint2;
+    private: physics::JointPtr joint3;
+    
     
     public: ManipulatorPlugin() {
       if(!ros::isInitialized()){
@@ -33,6 +37,13 @@ namespace gazebo
       );
 
       this->torque_sub = this->rosNode->subscribe('/torque_values', 1, &ManipulatorPlugin::callback)
+      this->ref_pos_sub = this->rosNode->subscribe('/position_reference', 1, &ManipulatorPlugin::posCallback)
+      this->ref_vel_sub = this->rosNode->subscribe('/velocity_reference', 1, &ManipulatorPlugin::velCallback)
+      this->ref_acc_sub = this->rosNode->subscribe('/acceleration_reference', 1, &ManipulatorPlugin::accCallback)
+
+      joint1 = model->GetJoint('base_link_link_01');
+      joint2 = model->GetJoint('link_01_link_02');
+      joint3 = model->GetJoint('link_02_link_03');
 
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
@@ -59,6 +70,18 @@ namespace gazebo
       link1->SetTorque(tau_1);
       link2->SetTorque(taU_2);
       link3->SetTorque(tau_3);
+
+    }
+
+    public: void posCallback(const man_controller::Traj& msg){
+      
+      joint1_pos = msg.num1;
+      joint2_pos = msg.num2;
+      joint3_pos = msg.num3;
+
+      joint1->SetJointPosition(joint1_pos);
+      joint2->SetJointPosition(joint2_pos);
+      joint3->SetJointPosition(joint3_pos);
 
     }
 
