@@ -432,69 +432,69 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 #=============================================================================
-# Target rules for targets named shvan_msgs_generate_messages_cpp
+# Target rules for targets named man_controller_generate_messages_cpp
 
 # Build rule for target.
-shvan_msgs_generate_messages_cpp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 shvan_msgs_generate_messages_cpp
-.PHONY : shvan_msgs_generate_messages_cpp
+man_controller_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 man_controller_generate_messages_cpp
+.PHONY : man_controller_generate_messages_cpp
 
 # fast build rule for target.
-shvan_msgs_generate_messages_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build
-.PHONY : shvan_msgs_generate_messages_cpp/fast
+man_controller_generate_messages_cpp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_cpp.dir/build.make CMakeFiles/man_controller_generate_messages_cpp.dir/build
+.PHONY : man_controller_generate_messages_cpp/fast
 
 #=============================================================================
-# Target rules for targets named shvan_msgs_generate_messages_eus
+# Target rules for targets named man_controller_generate_messages_eus
 
 # Build rule for target.
-shvan_msgs_generate_messages_eus: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 shvan_msgs_generate_messages_eus
-.PHONY : shvan_msgs_generate_messages_eus
+man_controller_generate_messages_eus: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 man_controller_generate_messages_eus
+.PHONY : man_controller_generate_messages_eus
 
 # fast build rule for target.
-shvan_msgs_generate_messages_eus/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_eus.dir/build.make CMakeFiles/shvan_msgs_generate_messages_eus.dir/build
-.PHONY : shvan_msgs_generate_messages_eus/fast
+man_controller_generate_messages_eus/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_eus.dir/build.make CMakeFiles/man_controller_generate_messages_eus.dir/build
+.PHONY : man_controller_generate_messages_eus/fast
 
 #=============================================================================
-# Target rules for targets named shvan_msgs_generate_messages_lisp
+# Target rules for targets named man_controller_generate_messages_lisp
 
 # Build rule for target.
-shvan_msgs_generate_messages_lisp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 shvan_msgs_generate_messages_lisp
-.PHONY : shvan_msgs_generate_messages_lisp
+man_controller_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 man_controller_generate_messages_lisp
+.PHONY : man_controller_generate_messages_lisp
 
 # fast build rule for target.
-shvan_msgs_generate_messages_lisp/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build
-.PHONY : shvan_msgs_generate_messages_lisp/fast
+man_controller_generate_messages_lisp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_lisp.dir/build.make CMakeFiles/man_controller_generate_messages_lisp.dir/build
+.PHONY : man_controller_generate_messages_lisp/fast
 
 #=============================================================================
-# Target rules for targets named shvan_msgs_generate_messages_nodejs
+# Target rules for targets named man_controller_generate_messages_nodejs
 
 # Build rule for target.
-shvan_msgs_generate_messages_nodejs: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 shvan_msgs_generate_messages_nodejs
-.PHONY : shvan_msgs_generate_messages_nodejs
+man_controller_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 man_controller_generate_messages_nodejs
+.PHONY : man_controller_generate_messages_nodejs
 
 # fast build rule for target.
-shvan_msgs_generate_messages_nodejs/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build
-.PHONY : shvan_msgs_generate_messages_nodejs/fast
+man_controller_generate_messages_nodejs/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_nodejs.dir/build.make CMakeFiles/man_controller_generate_messages_nodejs.dir/build
+.PHONY : man_controller_generate_messages_nodejs/fast
 
 #=============================================================================
-# Target rules for targets named shvan_msgs_generate_messages_py
+# Target rules for targets named man_controller_generate_messages_py
 
 # Build rule for target.
-shvan_msgs_generate_messages_py: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 shvan_msgs_generate_messages_py
-.PHONY : shvan_msgs_generate_messages_py
+man_controller_generate_messages_py: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 man_controller_generate_messages_py
+.PHONY : man_controller_generate_messages_py
 
 # fast build rule for target.
-shvan_msgs_generate_messages_py/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_py.dir/build.make CMakeFiles/shvan_msgs_generate_messages_py.dir/build
-.PHONY : shvan_msgs_generate_messages_py/fast
+man_controller_generate_messages_py/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_py.dir/build.make CMakeFiles/man_controller_generate_messages_py.dir/build
+.PHONY : man_controller_generate_messages_py/fast
 
 #=============================================================================
 # Target rules for targets named motor_plugin
@@ -549,6 +549,11 @@ help:
 	@echo "... clean_test_results"
 	@echo "... download_extra_data"
 	@echo "... doxygen"
+	@echo "... man_controller_generate_messages_cpp"
+	@echo "... man_controller_generate_messages_eus"
+	@echo "... man_controller_generate_messages_lisp"
+	@echo "... man_controller_generate_messages_nodejs"
+	@echo "... man_controller_generate_messages_py"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... roscpp_generate_messages_lisp"
@@ -560,11 +565,6 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_nodejs"
 	@echo "... rosgraph_msgs_generate_messages_py"
 	@echo "... run_tests"
-	@echo "... shvan_msgs_generate_messages_cpp"
-	@echo "... shvan_msgs_generate_messages_eus"
-	@echo "... shvan_msgs_generate_messages_lisp"
-	@echo "... shvan_msgs_generate_messages_nodejs"
-	@echo "... shvan_msgs_generate_messages_py"
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... std_msgs_generate_messages_eus"
 	@echo "... std_msgs_generate_messages_lisp"

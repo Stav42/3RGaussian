@@ -3460,4 +3460,5 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: \
   /Users/stav.42/miniconda3/envs/ros_env/include/ros/param.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/ros/topic.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/std_msgs/Float64.h \
-  /Users/stav.42/miniconda3/envs/ros_env/include/ros/message_operations.h
+  /Users/stav.42/miniconda3/envs/ros_env/include/ros/message_operations.h \
+  /Users/stav.42/ws/devel/.private/man_controller/include/man_controller/Traj.h

@@ -488,6 +488,9 @@ jsoncpp_DIR:PATH=/Users/stav.42/miniconda3/envs/ros_env/lib/cmake/jsoncpp
 //Path to a library.
 lib:FILEPATH=/Users/stav.42/miniconda3/envs/ros_env/lib/libxmlrpcpp.dylib
 
+//The directory containing a CMake configuration file for man_controller.
+man_controller_DIR:PATH=/Users/stav.42/ws/devel/share/man_controller/cmake
+
 //The directory containing a CMake configuration file for message_runtime.
 message_runtime_DIR:PATH=/Users/stav.42/miniconda3/envs/ros_env/share/message_runtime/cmake
 
@@ -568,9 +571,6 @@ rostime_DIR:PATH=/Users/stav.42/miniconda3/envs/ros_env/share/rostime/cmake
 
 //The directory containing a CMake configuration file for sdformat9.
 sdformat9_DIR:PATH=/Users/stav.42/miniconda3/envs/ros_env/lib/cmake/sdformat9
-
-//The directory containing a CMake configuration file for shvan_msgs.
-shvan_msgs_DIR:PATH=/Users/stav.42/dev/quadruped_software/ros/devel/share/shvan_msgs/cmake
 
 //Value Computed by CMake
 shvan_plugins_BINARY_DIR:STATIC=/Users/stav.42/ws/src/man_controller/plugins/build
@@ -807,7 +807,7 @@ DL_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: DL_LIBRARIES
 DL_LIBRARIES-ADVANCED:INTERNAL=1
 //Details about finding Boost
-FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/Users/stav.42/miniconda3/envs/ros_env/lib/cmake/Boost-1.74.0/BoostConfig.cmake][cfound components: thread system filesystem program_options regex iostreams date_time ][v1.74.0(1.40.0)]
+FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/Users/stav.42/miniconda3/envs/ros_env/lib/cmake/Boost-1.74.0/BoostConfig.cmake][cfound components: system ][v1.74.0()]
 //Details about finding CURL
 FIND_PACKAGE_MESSAGE_DETAILS_CURL:INTERNAL=[/Users/stav.42/miniconda3/envs/ros_env/lib/libcurl.dylib][/Users/stav.42/miniconda3/envs/ros_env/include][c ][v7.86.0()]
 //Details about finding DART

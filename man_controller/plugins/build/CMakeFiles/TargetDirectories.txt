@@ -18,11 +18,11 @@
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/std_msgs_generate_messages_lisp.dir
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/std_msgs_generate_messages_nodejs.dir
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/std_msgs_generate_messages_py.dir
-/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/shvan_msgs_generate_messages_cpp.dir
-/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/shvan_msgs_generate_messages_eus.dir
-/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/shvan_msgs_generate_messages_lisp.dir
-/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/shvan_msgs_generate_messages_nodejs.dir
-/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/shvan_msgs_generate_messages_py.dir
+/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/man_controller_generate_messages_cpp.dir
+/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/man_controller_generate_messages_eus.dir
+/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/man_controller_generate_messages_lisp.dir
+/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/man_controller_generate_messages_nodejs.dir
+/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/man_controller_generate_messages_py.dir
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/motor_plugin.dir
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/test.dir
 /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles/edit_cache.dir

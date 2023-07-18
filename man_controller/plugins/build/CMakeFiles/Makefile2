@@ -91,11 +91,11 @@ clean: CMakeFiles/std_msgs_generate_messages_eus.dir/clean
 clean: CMakeFiles/std_msgs_generate_messages_lisp.dir/clean
 clean: CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/std_msgs_generate_messages_py.dir/clean
-clean: CMakeFiles/shvan_msgs_generate_messages_cpp.dir/clean
-clean: CMakeFiles/shvan_msgs_generate_messages_eus.dir/clean
-clean: CMakeFiles/shvan_msgs_generate_messages_lisp.dir/clean
-clean: CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/clean
-clean: CMakeFiles/shvan_msgs_generate_messages_py.dir/clean
+clean: CMakeFiles/man_controller_generate_messages_cpp.dir/clean
+clean: CMakeFiles/man_controller_generate_messages_eus.dir/clean
+clean: CMakeFiles/man_controller_generate_messages_lisp.dir/clean
+clean: CMakeFiles/man_controller_generate_messages_nodejs.dir/clean
+clean: CMakeFiles/man_controller_generate_messages_py.dir/clean
 clean: CMakeFiles/motor_plugin.dir/clean
 .PHONY : clean
 
@@ -620,134 +620,134 @@ CMakeFiles/std_msgs_generate_messages_py.dir/clean:
 .PHONY : CMakeFiles/std_msgs_generate_messages_py.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/shvan_msgs_generate_messages_cpp.dir
+# Target rules for target CMakeFiles/man_controller_generate_messages_cpp.dir
 
 # All Build rule for target.
-CMakeFiles/shvan_msgs_generate_messages_cpp.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_cpp.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target shvan_msgs_generate_messages_cpp"
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_cpp.dir/all
+CMakeFiles/man_controller_generate_messages_cpp.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_cpp.dir/build.make CMakeFiles/man_controller_generate_messages_cpp.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_cpp.dir/build.make CMakeFiles/man_controller_generate_messages_cpp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target man_controller_generate_messages_cpp"
+.PHONY : CMakeFiles/man_controller_generate_messages_cpp.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/shvan_msgs_generate_messages_cpp.dir/rule: cmake_check_build_system
+CMakeFiles/man_controller_generate_messages_cpp.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/shvan_msgs_generate_messages_cpp.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/man_controller_generate_messages_cpp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_cpp.dir/rule
+.PHONY : CMakeFiles/man_controller_generate_messages_cpp.dir/rule
 
 # Convenience name for target.
-shvan_msgs_generate_messages_cpp: CMakeFiles/shvan_msgs_generate_messages_cpp.dir/rule
-.PHONY : shvan_msgs_generate_messages_cpp
+man_controller_generate_messages_cpp: CMakeFiles/man_controller_generate_messages_cpp.dir/rule
+.PHONY : man_controller_generate_messages_cpp
 
 # clean rule for target.
-CMakeFiles/shvan_msgs_generate_messages_cpp.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_cpp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_cpp.dir/clean
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_cpp.dir/clean
+CMakeFiles/man_controller_generate_messages_cpp.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_cpp.dir/build.make CMakeFiles/man_controller_generate_messages_cpp.dir/clean
+.PHONY : CMakeFiles/man_controller_generate_messages_cpp.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/shvan_msgs_generate_messages_eus.dir
+# Target rules for target CMakeFiles/man_controller_generate_messages_eus.dir
 
 # All Build rule for target.
-CMakeFiles/shvan_msgs_generate_messages_eus.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_eus.dir/build.make CMakeFiles/shvan_msgs_generate_messages_eus.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_eus.dir/build.make CMakeFiles/shvan_msgs_generate_messages_eus.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target shvan_msgs_generate_messages_eus"
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_eus.dir/all
+CMakeFiles/man_controller_generate_messages_eus.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_eus.dir/build.make CMakeFiles/man_controller_generate_messages_eus.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_eus.dir/build.make CMakeFiles/man_controller_generate_messages_eus.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target man_controller_generate_messages_eus"
+.PHONY : CMakeFiles/man_controller_generate_messages_eus.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/shvan_msgs_generate_messages_eus.dir/rule: cmake_check_build_system
+CMakeFiles/man_controller_generate_messages_eus.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/shvan_msgs_generate_messages_eus.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/man_controller_generate_messages_eus.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_eus.dir/rule
+.PHONY : CMakeFiles/man_controller_generate_messages_eus.dir/rule
 
 # Convenience name for target.
-shvan_msgs_generate_messages_eus: CMakeFiles/shvan_msgs_generate_messages_eus.dir/rule
-.PHONY : shvan_msgs_generate_messages_eus
+man_controller_generate_messages_eus: CMakeFiles/man_controller_generate_messages_eus.dir/rule
+.PHONY : man_controller_generate_messages_eus
 
 # clean rule for target.
-CMakeFiles/shvan_msgs_generate_messages_eus.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_eus.dir/build.make CMakeFiles/shvan_msgs_generate_messages_eus.dir/clean
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_eus.dir/clean
+CMakeFiles/man_controller_generate_messages_eus.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_eus.dir/build.make CMakeFiles/man_controller_generate_messages_eus.dir/clean
+.PHONY : CMakeFiles/man_controller_generate_messages_eus.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/shvan_msgs_generate_messages_lisp.dir
+# Target rules for target CMakeFiles/man_controller_generate_messages_lisp.dir
 
 # All Build rule for target.
-CMakeFiles/shvan_msgs_generate_messages_lisp.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_lisp.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target shvan_msgs_generate_messages_lisp"
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_lisp.dir/all
+CMakeFiles/man_controller_generate_messages_lisp.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_lisp.dir/build.make CMakeFiles/man_controller_generate_messages_lisp.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_lisp.dir/build.make CMakeFiles/man_controller_generate_messages_lisp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target man_controller_generate_messages_lisp"
+.PHONY : CMakeFiles/man_controller_generate_messages_lisp.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/shvan_msgs_generate_messages_lisp.dir/rule: cmake_check_build_system
+CMakeFiles/man_controller_generate_messages_lisp.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/shvan_msgs_generate_messages_lisp.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/man_controller_generate_messages_lisp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_lisp.dir/rule
+.PHONY : CMakeFiles/man_controller_generate_messages_lisp.dir/rule
 
 # Convenience name for target.
-shvan_msgs_generate_messages_lisp: CMakeFiles/shvan_msgs_generate_messages_lisp.dir/rule
-.PHONY : shvan_msgs_generate_messages_lisp
+man_controller_generate_messages_lisp: CMakeFiles/man_controller_generate_messages_lisp.dir/rule
+.PHONY : man_controller_generate_messages_lisp
 
 # clean rule for target.
-CMakeFiles/shvan_msgs_generate_messages_lisp.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_lisp.dir/build.make CMakeFiles/shvan_msgs_generate_messages_lisp.dir/clean
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_lisp.dir/clean
+CMakeFiles/man_controller_generate_messages_lisp.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_lisp.dir/build.make CMakeFiles/man_controller_generate_messages_lisp.dir/clean
+.PHONY : CMakeFiles/man_controller_generate_messages_lisp.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/shvan_msgs_generate_messages_nodejs.dir
+# Target rules for target CMakeFiles/man_controller_generate_messages_nodejs.dir
 
 # All Build rule for target.
-CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target shvan_msgs_generate_messages_nodejs"
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/all
+CMakeFiles/man_controller_generate_messages_nodejs.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_nodejs.dir/build.make CMakeFiles/man_controller_generate_messages_nodejs.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_nodejs.dir/build.make CMakeFiles/man_controller_generate_messages_nodejs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target man_controller_generate_messages_nodejs"
+.PHONY : CMakeFiles/man_controller_generate_messages_nodejs.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/rule: cmake_check_build_system
+CMakeFiles/man_controller_generate_messages_nodejs.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/man_controller_generate_messages_nodejs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/rule
+.PHONY : CMakeFiles/man_controller_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
-shvan_msgs_generate_messages_nodejs: CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/rule
-.PHONY : shvan_msgs_generate_messages_nodejs
+man_controller_generate_messages_nodejs: CMakeFiles/man_controller_generate_messages_nodejs.dir/rule
+.PHONY : man_controller_generate_messages_nodejs
 
 # clean rule for target.
-CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/clean
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_nodejs.dir/clean
+CMakeFiles/man_controller_generate_messages_nodejs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_nodejs.dir/build.make CMakeFiles/man_controller_generate_messages_nodejs.dir/clean
+.PHONY : CMakeFiles/man_controller_generate_messages_nodejs.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/shvan_msgs_generate_messages_py.dir
+# Target rules for target CMakeFiles/man_controller_generate_messages_py.dir
 
 # All Build rule for target.
-CMakeFiles/shvan_msgs_generate_messages_py.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_py.dir/build.make CMakeFiles/shvan_msgs_generate_messages_py.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_py.dir/build.make CMakeFiles/shvan_msgs_generate_messages_py.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target shvan_msgs_generate_messages_py"
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_py.dir/all
+CMakeFiles/man_controller_generate_messages_py.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_py.dir/build.make CMakeFiles/man_controller_generate_messages_py.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_py.dir/build.make CMakeFiles/man_controller_generate_messages_py.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num= "Built target man_controller_generate_messages_py"
+.PHONY : CMakeFiles/man_controller_generate_messages_py.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/shvan_msgs_generate_messages_py.dir/rule: cmake_check_build_system
+CMakeFiles/man_controller_generate_messages_py.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/shvan_msgs_generate_messages_py.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/man_controller_generate_messages_py.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_py.dir/rule
+.PHONY : CMakeFiles/man_controller_generate_messages_py.dir/rule
 
 # Convenience name for target.
-shvan_msgs_generate_messages_py: CMakeFiles/shvan_msgs_generate_messages_py.dir/rule
-.PHONY : shvan_msgs_generate_messages_py
+man_controller_generate_messages_py: CMakeFiles/man_controller_generate_messages_py.dir/rule
+.PHONY : man_controller_generate_messages_py
 
 # clean rule for target.
-CMakeFiles/shvan_msgs_generate_messages_py.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/shvan_msgs_generate_messages_py.dir/build.make CMakeFiles/shvan_msgs_generate_messages_py.dir/clean
-.PHONY : CMakeFiles/shvan_msgs_generate_messages_py.dir/clean
+CMakeFiles/man_controller_generate_messages_py.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/man_controller_generate_messages_py.dir/build.make CMakeFiles/man_controller_generate_messages_py.dir/clean
+.PHONY : CMakeFiles/man_controller_generate_messages_py.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/motor_plugin.dir

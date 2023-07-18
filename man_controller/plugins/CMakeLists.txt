@@ -13,11 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  shvan_msgs
+  man_controller
 )
 
+find_package(Boost REQUIRED COMPONENTS system)
+
+
 include_directories(${roscpp_INCLUDE_DIRS})
-include_directories(include ${GAZEBO_INCLUDE_DIRS})# /usr/local/MATLAB/R2021a/extern/include)
+include_directories(include ${GAZEBO_INCLUDE_DIRS}   ${Boost_INCLUDE_DIRS})# /usr/local/MATLAB/R2021a/extern/include)
 include_directories(${catkin_INCLUDE_DIRS})
 
 set(INCLUDE_DIR "include")
