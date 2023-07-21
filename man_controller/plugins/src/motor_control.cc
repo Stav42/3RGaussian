@@ -17,10 +17,17 @@ namespace gazebo
     private: ros::NodeHandle* rosNode;
     private: ros::Subscriber torque_sub;
     private: ros::Subscriber ref_pos_sub;
-    private: ros::Publisher joint_state_publisher;
+    private: ros::Publisher joint_pos_publisher;
+    private: ros::Publisher joint_vel_publisher;
+    private: ros::Publisher joint_acc_publisher;
     private: physics::JointPtr joint1;
     private: physics::JointPtr joint2;
     private: physics::JointPtr joint3;
+    private: physics::JointPtr joint4;
+    private: man_controller::Traj joint_pos;
+    private: man_controller::Traj joint_vel;
+    private: man_controller::Traj joint_acc;
+    private: float dt;
     private: gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     
@@ -45,20 +52,58 @@ namespace gazebo
 
       this->torque_sub = this->rosNode->subscribe<man_controller::Traj>("/torque_values", 1, boost::bind(&ManipulatorPlugin::callback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
+      this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
+      this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
       // this->ref_vel_sub = this->rosNode->subscribe('/velocity_reference', 1, &ManipulatorPlugin::velCallback)
-      // this->ref_acc_sub = this->rosNode->subscribe('/acceleration_reference', 1, &ManipulatorPlugin::accCallback)
+      // this->ref_acc_sub = this->rosNode->subscribe('/acceleration_reference', 1, &ManipulatorPlugin::accCallback)xs
 
-      this->joint_state_publisher = this->rosNode->publish;
 
       joint1 = this->model->GetJoint("base_link_link_01");
       joint2 = this->model->GetJoint("link_01_link_02");
       joint3 = this->model->GetJoint("link_02_link_03");
+      joint4 = this->model->GetJoint("link_03_link_04");
 
+      this->dt = 0.1;
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
     public: void OnUpdate(){
       // std::cout<<"Print if working"<<std::endl;
+      this->joint_pos = man_controller::Traj();
+
+      float vel1 = this->joint1->Position(0);
+      float vel2 = this->joint2->Position(0);
+      float vel3 = this->joint3->Position(0);
+
+      this->joint_pos.num1 = this->joint1->Position(0);
+      this->joint_pos.num2 = this->joint2->Position(0);
+      this->joint_pos.num3 = this->joint3->Position(0);
+      this->joint_pos.num4 = this->joint4->Position(0);
+      this->joint_pos_publisher.publish(this->joint_pos);
+
+      man_controller::Traj vel = man_controller::Traj();
+
+      vel.num1 = this->joint1->GetVelocity(0);
+      vel.num2 = this->joint2->GetVelocity(0);
+      vel.num3 = this->joint3->GetVelocity(0);
+      vel.num4 = this->joint4->GetVelocity(0);
+      
+      man_controller::Traj acc = man_controller::Traj();
+
+      acc.num1 = (vel.num1 - this->joint_vel.num1)/dt;
+      acc.num2 = (vel.num2 - this->joint_vel.num2)/dt;
+      acc.num3 = (vel.num3 - this->joint_vel.num3)/dt;
+      acc.num4 = (vel.num4 - this->joint_vel.num4)/dt;
+
+      this->joint_vel.num1 = this->joint1->GetVelocity(0);
+      this->joint_vel.num2 = this->joint2->GetVelocity(0);
+      this->joint_vel.num3 = this->joint3->GetVelocity(0);
+      this->joint_vel.num4 = this->joint4->GetVelocity(0);
+      this->joint_vel_publisher.publish(this->joint_vel);    
+
+      this->joint_acc_publisher.publish(acc);
+
       ros::spinOnce();
     }
 
