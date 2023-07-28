@@ -83,14 +83,30 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_plugin.dir/src/motor_control.cc.s"
 	/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc -o CMakeFiles/motor_plugin.dir/src/motor_control.cc.s
 
+CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o: CMakeFiles/motor_plugin.dir/flags.make
+CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o: /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp
+CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o: CMakeFiles/motor_plugin.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o"
+	/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o -MF CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o.d -o CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o -c /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp
+
+CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.i"
+	/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp > CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.i
+
+CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.s"
+	/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp -o CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.s
+
 # Object files for target motor_plugin
 motor_plugin_OBJECTS = \
-"CMakeFiles/motor_plugin.dir/src/motor_control.cc.o"
+"CMakeFiles/motor_plugin.dir/src/motor_control.cc.o" \
+"CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o"
 
 # External object files for target motor_plugin
 motor_plugin_EXTERNAL_OBJECTS =
 
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/motor_control.cc.o
+libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/build.make
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libSimTKsimbody.3.7.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libdart.6.12.1.dylib
@@ -144,6 +160,38 @@ libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_backend_interface.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/liblog4cxx.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_regex.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libxmlrpcpp.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libroscpp_serialization.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librostime.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_date_time.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libcpp_common.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_system.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_thread.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libconsole_bridge.1.0.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libroscpp.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_chrono.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_filesystem.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_log4cxx.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_backend_interface.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/liblog4cxx.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_regex.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libroscpp_serialization.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libxmlrpcpp.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librostime.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_date_time.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libcpp_common.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_system.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_thread.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libconsole_bridge.1.0.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libroscpp.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_chrono.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_filesystem.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_log4cxx.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librosconsole_backend_interface.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/liblog4cxx.dylib
+libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libboost_regex.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libroscpp_serialization.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libxmlrpcpp.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/librostime.dylib
@@ -169,7 +217,7 @@ libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libignition-ma
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libprotobuf.dylib
 libmotor_plugin.dylib: /Users/stav.42/miniconda3/envs/ros_env/lib/libignition-common3.3.13.2.dylib
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libmotor_plugin.dylib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libmotor_plugin.dylib"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/motor_plugin.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

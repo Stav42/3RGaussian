@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-    <group ns='/3r'>
 
         <!-- Robot Model-->
         <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find man_description)/urdf/manipulator.xacro'"/>
-        <arg name="x" default="0.0"/>
-        <arg name="y" default="0.0"/>
-        <arg name="z" default="0.5"/>
+        <arg name="x_pos" default="0.0"/>
+        <arg name="y_pos" default="0.0"/>
+        <arg name="z_pos" default="0.5"/>
+
+        <env name="GAZEBO_PLUGIN_PATH" value="GAZEBO_PLUGIN_PATH:$(find man_controller)/plugins/build/"/>
+
+
+        <arg name="gui" default="true"/>
+        <arg name="debug" default="false"/>
+        <arg name="verbose" default="true"/>
+        <arg name="paused" default="true"/>
+        <arg name="respawn_gazebo" default="false"/>
+
+        <include file="$(find gazebo_ros)/launch/empty_world.launch">
+            <arg name="gui" value="$(arg gui)"/>
+            <arg name="debug" value="$(arg debug)"/>
+            <arg name="verbose" value="$(arg verbose)"/>
+            <arg name="paused" value="$(arg paused)"/>
+            <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+        </include>
+
+        <node name="Manipulator_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
+        args="-param robot_description -urdf -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -model 3r"/> 
+
 
         <!-- Spawn Model -->
-        <node name="Manipulator_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
-            args="-urdf -param robot_description -model 3R -x $(arg x) -y $(arg y) -z $(arg z)"/> 
 
-    </group>
+
 </launch>

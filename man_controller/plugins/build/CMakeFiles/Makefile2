@@ -756,12 +756,12 @@ CMakeFiles/man_controller_generate_messages_py.dir/clean:
 CMakeFiles/motor_plugin.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=1,2 "Built target motor_plugin"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=1,2,3 "Built target motor_plugin"
 .PHONY : CMakeFiles/motor_plugin.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/motor_plugin.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/motor_plugin.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles 0
 .PHONY : CMakeFiles/motor_plugin.dir/rule

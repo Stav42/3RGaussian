@@ -69,19 +69,19 @@
 
     <xacro:m_joint name="base_link_link_01" type="revolute" axis_xyz="0 0 1" origin_rpy="0 0 0" origin_xyz="0 0 0.5" parent="base_link" child="link_01"/>
 
-    <xacro:m_link_cylinder name="link_01" origin_rpy="0 0 0" origin_xyz="0 0 0.2" radius="0.35" length="0.4" mass="157.633" ixx="13.235" iyy="13.235" izz="9.655" ixy="0" ixz="0" iyz="0"/>
+    <xacro:m_link_cylinder name="link_01" origin_rpy="0 0 0" origin_xyz="0 0 0.2" radius="0.35" length="0.4" mass="1.5633" ixx="0.16447" iyy="0.16447" izz="0.0957" ixy="0" ixz="0" iyz="0"/>
 
     <xacro:m_joint name="link_01_link_02" type="revolute" axis_xyz="0 1 0" origin_rpy="0 0 0" origin_xyz="0 0 0.4" parent="link_01" child="link_02"/>
 
-    <xacro:m_link_cylinder name="link_02" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+    <xacro:m_link_cylinder name="link_02" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="1.0986" ixx="0.06168" ixy="0.0" ixz="0.0" iyy="0.06168" iyz="0.0" izz="0.0126"/>
 
     <xacro:m_joint name="link_02_link_03" type="revolute" axis_xyz="0 1 0" origin_rpy="0 0 0" origin_xyz="0 0 0.8" parent="link_02" child="link_03"/>
         
-    <xacro:m_link_cylinder name="link_03" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+    <xacro:m_link_cylinder name="link_03" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="1.0986" ixx="0.06168" ixy="0.0" ixz="0.0" iyy="0.06168" iyz="0.0" izz="0.0126"/>
 
     <xacro:m_joint name="link_03_link_04" type="revolute" axis_xyz="0 0 1" origin_rpy="0 0 0" origin_xyz="0 0 0.8" parent="link_03" child="link_04"/>
 
-    <xacro:m_link_cylinder name="link_04" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="57.986" ixx="12.679" ixy="0.0" ixz="0.0" iyy="12.679" iyz="0.0" izz="0.651"/>
+    <xacro:m_link_cylinder name="link_04" origin_rpy="0 0 0" origin_xyz="0 0 0.4" radius="0.15" length="0.8" mass="1.0986" ixx="0.06168" ixy="0.0" ixz="0.0" iyy="0.06168" iyz="0.0" izz="0.0126"/>
 
     <gazebo>
         <plugin name="motor_control" filename="libmotor_plugin.dylib">

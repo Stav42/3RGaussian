@@ -7,6 +7,7 @@ project(man_controller)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 find_package(catkin REQUIRED COMPONENTS
@@ -25,6 +26,8 @@ generate_messages(
   DEPENDENCIES
   std_msgs
 )
+
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -106,7 +109,7 @@ generate_messages(
 # )
 
 ###################################
-## catkin specific configuration ##
+## catkin specific configuration ##asda
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
@@ -115,7 +118,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES man_description
  CATKIN_DEPENDS rospy roscpp std_msgs message_runtime
 #  DEPENDS system_lib
@@ -127,15 +130,28 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
-
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/man_description.cpp
+# include_directories(
+#   include
+#   ${catkin_INCLUDE_DIRS}
 # )
+
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+# )
+
+
+# add_library(${PROJECT_NAME} src/ff_torque.cpp)
+
+# target_link_libraries(${PROJECT_NAME}
+#   ${catkin_LIBRARIES}
+# )
+
+# add_executable(ff_torque_node src/ff_torque.cpp)
+# target_link_libraries(ff_torque_node ${catkin_LIBRARIES})
+# add_dependencies(ff_torque_node ${PROJECT_NAME}_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+
+# add_dependencies
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -158,7 +174,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
+# target_link_libraries(ff_torque
 #   ${catkin_LIBRARIES}
 # )
 

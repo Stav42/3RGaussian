@@ -509,6 +509,30 @@ motor_plugin/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/build
 .PHONY : motor_plugin/fast
 
+src/ff_torque.o: src/ff_torque.cpp.o
+.PHONY : src/ff_torque.o
+
+# target to build an object file
+src/ff_torque.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o
+.PHONY : src/ff_torque.cpp.o
+
+src/ff_torque.i: src/ff_torque.cpp.i
+.PHONY : src/ff_torque.i
+
+# target to preprocess a source file
+src/ff_torque.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.i
+.PHONY : src/ff_torque.cpp.i
+
+src/ff_torque.s: src/ff_torque.cpp.s
+.PHONY : src/ff_torque.s
+
+# target to generate assembly for a file
+src/ff_torque.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.s
+.PHONY : src/ff_torque.cpp.s
+
 src/motor_control.o: src/motor_control.cc.o
 .PHONY : src/motor_control.o
 
@@ -572,6 +596,9 @@ help:
 	@echo "... std_msgs_generate_messages_py"
 	@echo "... tests"
 	@echo "... motor_plugin"
+	@echo "... src/ff_torque.o"
+	@echo "... src/ff_torque.i"
+	@echo "... src/ff_torque.s"
 	@echo "... src/motor_control.o"
 	@echo "... src/motor_control.i"
 	@echo "... src/motor_control.s"

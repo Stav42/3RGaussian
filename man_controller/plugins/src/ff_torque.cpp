@@ -4,7 +4,7 @@
 #include "std_msgs/Float32.h"
 #include <man_controller/Traj.h>
 #include <cmath>
-#include "man_controller/ff_torque.h"
+#include "ff_torque.h"
         
 InvDynController::InvDynController(){
 
@@ -24,33 +24,33 @@ InvDynController::InvDynController(){
     KD = Eigen::Matrix3f::Zero();
 
 
-    // I_1 << 13.235, 0, 0,
-    //        0, 13.235, 0,
-    //        0, 0, 9.655;
+    I_1 << 0.16447, 0, 0,
+           0, 0.16447, 0,
+           0, 0, 0.0957;
 
 
-    // I_2 << 12.679, 0, 0,
-    //        0, 12.679, 0,
-    //        0, 0, 0.651;
+    I_2 << 0.06168, 0, 0,
+           0, 0.06168, 0,
+           0, 0, 0.0126;
 
-    // I_3 << 12.679, 0, 0,
-    //        0, 12.679, 0,
-        //    0, 0, 0.651;
+    I_3 << 0.06168, 0, 0,
+           0, 0.06168, 0,
+           0, 0, 0.0126;
 
-    m1 = 157.633;
-    m2 = 57.986;
-    m3 = 57.986;
+    m1 = 1.5633;
+    m2 = 1.0986;
+    m3 = 1.0986;
     L1 = 0.4;
     L2 = 0.8;
     L3 = 0.8;
 
-    // KP << 100, 0, 0,
-    //       0, 100, 0,
-    //       0, 0, 100;
+    KP << 1000, 0, 0,
+          0, 800, 0,
+          0, 0, 100;
 
-    // KD << 100, 0, 0,
-    //       0, 100, 0,
-    //       0, 0, 100;
+    KD << 150, 0, 0,
+          0, 150, 0,
+          0, 0, 150;
 
     ff_torque = Eigen::Vector3f::Zero();
     fb_torque = Eigen::Vector3f::Zero();
@@ -98,8 +98,8 @@ Eigen::Vector3f InvDynController::get_ff_torque(){
 
     float ff_3 = term1 + term2 + term3 + term4 + term5 + term6 + term7;
 
-    // ff_torque  << ff_1, ff_2, ff_3;
-    ff_torque = Eigen::Vector3f::Zero();
+    ff_torque  << ff_1, ff_2, ff_3;
+    // ff_torque = Eigen::Vector3f::Zero();
     return ff_torque;
 }
 
@@ -107,19 +107,32 @@ Eigen::Vector3f InvDynController::get_fb_torque(){
     
     // fb_torque = Eigen::Vector3f::Zero();
     fb_torque = KP * (joint_pos_ref - joint_pos) + KD * (joint_vel_ref - joint_vel);
+    // std::cout<<"joint_pos_ref is: "<<joint_pos_ref<<std::endl;
+    // std::cout<<"joint_pos is: "<<joint_pos<<std::endl;
+    // joint_pos_ref[1] = 0;
+    // joint_pos_ref[0] = 0;
+    // fb_torque = KP * (joint_pos_ref - joint_pos);
+    // std::cout<<"fb_torque is: "<<fb_torque<<std::endl;
+    
     return fb_torque;
 
 };
 Eigen::Vector3f InvDynController::get_total_torque(){
     
-    if(!joint_pos_ref.isZero(0.001) && !joint_vel_ref.isZero(0.001) && !joint_acc_ref.isZero(0.001) && !joint_pos.isZero(0.001) && !joint_vel.isZero(0.001) && !joint_acc.isZero(0.001)){
+    // if(!joint_pos_ref.isZero(0.001) && !joint_vel_ref.isZero(0.001) && !joint_acc_ref.isZero(0.001)){
             // torque = get_ff_torque() + get_fb_torque();
-            return get_ff_torque() + get_fb_torque();
-    }
-    else{
-        std::cout<<"Some values not initialized yet"<<std::endl;
-        return Eigen::Vector3f::Zero();
-    }
+    Eigen::Vector3f ff = get_ff_torque();
+    Eigen::Vector3f fb = get_fb_torque();
+    std::cout<<"Feedforward Torque"<<ff<<std::endl<<"Feedback Torque"<<fb<<std::endl;
+    return ff + fb;
+    // return get_ff_torque() + get_fb_torque();
+    // return get_fb_torque();
+    // }
+    // else{
+        // 
+        // std::cout<<"Some values not initialized yet"<<std::endl;
+        // return Eigen::Vector3f::Zero();
+    // }
 
 
 };

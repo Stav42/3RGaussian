@@ -24,9 +24,9 @@ if __name__ == "__main__":
             acceleration.append(np.array([0, 0, 0, 0]))
             continue
         
-        joint1 = 4 * np.pi * step / len(steps)
-        joint2 = np.pi/2 + 0.5 * np.pi * np.sin(20 * np.pi * step/1000)
-        joint3 = np.pi/2 + 0.5 * np.pi * np.cos(20 * np.pi * step/1000)
+        joint1 = 0.7 * np.pi *  np.sin(20 * np.pi * step/1000)
+        joint2 = np.pi/8 + 0.01  * np.pi * np.sin(100 * np.pi * step/1000)
+        joint3 = np.pi/8 + 0.1 * np.pi * np.cos(100 * np.pi * step/1000)
         joint4 = 0
 
         # print(joint2)

@@ -1,0 +1,18 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/Users/stav.42/ws/devel/include/**",
+        "/usr/local/include/**",
+        "/Users/stav.42/miniconda3/envs/ros_env/include/**",
+        "/Users/stav.42/ws/src/man_controller/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

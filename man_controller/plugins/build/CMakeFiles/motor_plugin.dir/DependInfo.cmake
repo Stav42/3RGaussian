@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp" "CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o" "gcc" "CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o.d"
   "/Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc" "CMakeFiles/motor_plugin.dir/src/motor_control.cc.o" "gcc" "CMakeFiles/motor_plugin.dir/src/motor_control.cc.o.d"
   )
 

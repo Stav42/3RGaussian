@@ -4,7 +4,7 @@
 #include <std_msgs/Float64.h>
 #include <man_controller/Traj.h>
 #include <boost/bind.hpp>
-
+#include "ff_torque.h"
 
 
 namespace gazebo
@@ -12,11 +12,14 @@ namespace gazebo
   class ManipulatorPlugin : public ModelPlugin
   {
 
+    private: InvDynController InvDyn;
     private: physics::ModelPtr model;
     private: event::ConnectionPtr updateConnection;
     private: ros::NodeHandle* rosNode;
     private: ros::Subscriber torque_sub;
     private: ros::Subscriber ref_pos_sub;
+    private: ros::Subscriber ref_vel_sub;
+    private: ros::Subscriber ref_acc_sub;
     private: ros::Publisher joint_pos_publisher;
     private: ros::Publisher joint_vel_publisher;
     private: ros::Publisher joint_acc_publisher;
@@ -28,6 +31,7 @@ namespace gazebo
     private: man_controller::Traj joint_vel;
     private: man_controller::Traj joint_acc;
     private: float dt;
+    private: Eigen::VectorXf torque;
     private: gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     
@@ -40,23 +44,27 @@ namespace gazebo
       }
 
       this->rosNode = new ros::NodeHandle();
+      // this->InvDyn = InvDynController::InvDynController();
+
     }
 
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       this->model = _model;
 
+
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&ManipulatorPlugin::OnUpdate, this)
       );
 
-      this->torque_sub = this->rosNode->subscribe<man_controller::Traj>("/torque_values", 1, boost::bind(&ManipulatorPlugin::callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      // this->torque_sub = this->rosNode->subscribe<man_controller::Traj>("/torque_values", 1, boost::bind(&ManipulatorPlugin::callback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
-      // this->ref_vel_sub = this->rosNode->subscribe('/velocity_reference', 1, &ManipulatorPlugin::velCallback)
-      // this->ref_acc_sub = this->rosNode->subscribe('/acceleration_reference', 1, &ManipulatorPlugin::accCallback)xs
 
 
       joint1 = this->model->GetJoint("base_link_link_01");
@@ -65,6 +73,7 @@ namespace gazebo
       joint4 = this->model->GetJoint("link_03_link_04");
 
       this->dt = 0.1;
+      std::cout<<"Works 1"<<std::endl;
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
@@ -72,15 +81,18 @@ namespace gazebo
       // std::cout<<"Print if working"<<std::endl;
       this->joint_pos = man_controller::Traj();
 
-      float vel1 = this->joint1->Position(0);
-      float vel2 = this->joint2->Position(0);
-      float vel3 = this->joint3->Position(0);
+      float pos1 = this->joint1->Position(0);
+      float pos2 = this->joint2->Position(0);
+      float pos3 = this->joint3->Position(0);
+      float pos4 = this->joint4->Position(0);
 
-      this->joint_pos.num1 = this->joint1->Position(0);
-      this->joint_pos.num2 = this->joint2->Position(0);
-      this->joint_pos.num3 = this->joint3->Position(0);
-      this->joint_pos.num4 = this->joint4->Position(0);
+      this->joint_pos.num1 = pos1;
+      this->joint_pos.num2 = pos2;
+      this->joint_pos.num3 = pos3;
+      this->joint_pos.num4 = pos4;
       this->joint_pos_publisher.publish(this->joint_pos);
+
+      this->InvDyn.joint_pos << pos1, pos2, pos3;
 
       man_controller::Traj vel = man_controller::Traj();
 
@@ -88,6 +100,8 @@ namespace gazebo
       vel.num2 = this->joint2->GetVelocity(0);
       vel.num3 = this->joint3->GetVelocity(0);
       vel.num4 = this->joint4->GetVelocity(0);
+
+      this->InvDyn.joint_vel << vel.num1, vel.num2, vel.num3;
       
       man_controller::Traj acc = man_controller::Traj();
 
@@ -96,6 +110,8 @@ namespace gazebo
       acc.num3 = (vel.num3 - this->joint_vel.num3)/dt;
       acc.num4 = (vel.num4 - this->joint_vel.num4)/dt;
 
+      this->InvDyn.joint_acc << acc.num1, acc.num2, acc.num3;
+
       this->joint_vel.num1 = this->joint1->GetVelocity(0);
       this->joint_vel.num2 = this->joint2->GetVelocity(0);
       this->joint_vel.num3 = this->joint3->GetVelocity(0);
@@ -103,29 +119,24 @@ namespace gazebo
       this->joint_vel_publisher.publish(this->joint_vel);    
 
       this->joint_acc_publisher.publish(acc);
+      // joint1->SetForce(0, torque[0]);
+      // joint2->SetForce(0, torque[1]);
+      // joint3->SetForce(0, torque[2]);
 
+      std::cout<<"Current position: "<<this->InvDyn.joint_pos<<std::endl;
+      this->torque = this->InvDyn.get_total_torque();
+      std::cout<<"Desired Position"<<this->InvDyn.joint_pos_ref<< std::endl;
+      std::cout<<"Torque applied"<<this->torque<<std::endl;
+      joint1->SetForce(0, torque[0]);
+      joint2->SetForce(0, torque[1]);
+      joint3->SetForce(0, torque[2]);
+      
       ros::spinOnce();
     }
 
     // public: ignition::math::Vector3d format(data){
     //   return torque;
     // }
-
-    public: void callback(const man_controller::Traj::ConstPtr& msg){
-      
-      // float tau_1 = format(msg.data.torque[0]);
-      // tau_2 = format(msg.data.torque[1]);
-      // tau_3 = format(msg.data.torque[2]);
-
-      // const physics::LinkPtr link1 = model->GetLink('link01');
-      // const physics::LinkPtr link2 = model->GetLink('link02');
-      // const physics::LinkPtr link3 = model->GetLink('link03');
-      
-      // link1->SetTorque(tau_1);
-      // link2->SetTorque(taU_2);
-      // link3->SetTorque(tau_3);
-
-    }
 
     public: void posCallback(const man_controller::Traj::ConstPtr& msg){
       
@@ -136,45 +147,41 @@ namespace gazebo
       // PD Controller over the position
       double dt = 0.01;
 
-      // in your OnUpdate function or callback
-      double current_pos1 = this->joint1->Position(0);
-      double current_pos2 = this->joint2->Position(0);
-      double current_pos3 = this->joint3->Position(0);
-
-      std::cout<<"Current position of joint 1: "<<current_pos1<<std::endl;
-      std::cout<<"Desired position of joint 1: "<<joint1_pos<<std::endl;
-      std::cout<<"Current position of joint 2: "<<current_pos2<<std::endl;
-      std::cout<<"Desired position of joint 2: "<<joint2_pos<<std::endl;
-      std::cout<<"Current position of joint 3: "<<current_pos3<<std::endl;
-      std::cout<<"Desired position of joint 3: "<<joint3_pos<<std::endl;
+      this->InvDyn.joint_pos_ref << joint1_pos, joint2_pos, joint3_pos;
 
 
-      double error1 = joint1_pos - current_pos1;
-      double error2 = joint2_pos - current_pos2;
-      double error3 = joint3_pos - current_pos3;
+      // double error1 = joint1_pos - current_pos1;
+      // double error2 = joint2_pos - current_pos2;
+      // double error3 = joint3_pos - current_pos3;
 
-      double cmd1 = pid.Update(error1, dt);
-      double cmd2 = pid.Update(error2, dt);
-      double cmd3 = pid.Update(error3, dt);
+      // double cmd1 = pid.Update(error1, dt);
+      // double cmd2 = pid.Update(error2, dt);
+      // double cmd3 = pid.Update(error3, dt);
 
-      joint1->SetForce(0, cmd1);
-      joint2->SetForce(0, cmd2);
-      joint3->SetForce(0, cmd3);
+      // joint1->SetForce(0, cmd1);
+      // joint2->SetForce(0, cmd2);
+      // joint3->SetForce(0, cmd3);
 
     }
 
+
     public: void velCallback(const man_controller::Traj::ConstPtr& msg){
       
-      std::cout<<"Mission Failed Successfully!"<<std::endl;
-
       float joint1_vel = msg->num1;
       float joint2_vel = msg->num2;
       float joint3_vel = msg->num3;
 
-      this->joint1->SetVelocity(2, joint1_vel);
-      this->joint2->SetVelocity(1, joint2_vel);
-      this->joint3->SetVelocity(1, joint3_vel);
+      this->InvDyn.joint_vel_ref << joint1_vel, joint2_vel, joint3_vel;
 
+    }
+
+    public: void accCallback(const man_controller::Traj::ConstPtr& msg){
+      
+      float joint1_acc = msg->num1;
+      float joint2_acc = msg->num2;
+      float joint3_acc = msg->num3;
+
+      this->InvDyn.joint_acc_ref << joint1_acc, joint2_acc, joint3_acc;
     }
 
   };
