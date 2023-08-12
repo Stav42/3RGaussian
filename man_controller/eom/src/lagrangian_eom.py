@@ -1,6 +1,7 @@
 import numpy as np
 import sympy
-from sympy import symbols
+from sympy import symbols, hessian
+from sympy.vector import gradient
 from sympy import cos, sin
 from Transformation import R01, R12, R23, R34, P01, P12, P23, P34, I1, I2, I3
 from sympy import Matrix, Function, diff
@@ -63,6 +64,13 @@ def sum_of_pe(link1, link2, link3):
 
     return potential_energy(link1, T01) + potential_energy(link2, T01 * T12) + potential_energy(link3, T01 * T12 * T23)
 
+def gradient(f, params):
+    diff1 = diff(f, params[0])
+    diff2 = diff(f, params[1])
+    diff3 = diff(f, params[2])
+    
+    return [diff1, diff2, diff3]
+
 def main():
 
     links = obtain_links()
@@ -70,21 +78,31 @@ def main():
     K = sum_of_ke(link1, link2, link3)
     P = sum_of_pe(link1, link2, link3)
 
+    # print(P)
+
     L = K - P
     
+    M = hessian(K, [theta_d1, theta_d2, theta_d3])
+    print("\n Mass Matrix: ", M)
+    G = Matrix(gradient(P, [theta1, theta2, theta3]))
+    print("\n Gravity vector is: ", G)
+    H = Matrix(gradient(K, [theta_d1, theta_d2, theta_d3])).jacobian(Matrix([theta1, theta2, theta3])) * Matrix([theta_d1, theta_d2, theta_d3]) - Matrix(gradient(K, [theta1, theta2, theta3]))
+    # H = jacobian(gradient(K, [theta_d1, theta_d2, theta_d3]), [theta1, theta2, theta3]) * Matrix([theta_d1, theta_d2, theta_d3]) - gradient(K, [theta1, theta2, theta3])
+    print("\n NonLinear Term is: ", H)
+
     #For theta1:
     term1 = diff(L, theta_d1)
     term11 = diff(term1, t)
     term2 = diff(L, theta1)
     tau_1 = simplify(term11 - term2) 
-    print("Tau_1 is: ", tau_1)
+    # print("Tau_1 is: ", tau_1)
 
     #For theta2:
     term1 = diff(L, theta_d2)
     term11 = diff(term1, t)
     term2 = diff(L, theta2)
     tau_2 = simplify(term11 - term2) 
-    print("\nTau_2 is: ", tau_2)
+    # print("\nTau_2 is: ", tau_2)
 
     #For theta3:
     term1 = diff(L, theta_d3)
@@ -92,18 +110,23 @@ def main():
     term2 = diff(L, theta3)
     tau_3 = simplify(term11 - term2) 
     tau_3 = simplify(tau_3)
-    print("\nTau_3 is: ", tau_3)
+    # print("\nTau_3 is: ", tau_3)
 
-    f = open('output.txt', 'w')
-    f.write(mlatex(tau_3)+'\n')
-    f.write(mlatex(tau_2)+'\n')
-    f.write(mlatex(tau_1)+'\n')
+    final = Matrix([tau_1, tau_2, tau_3])
+
+    f = open('Matrices.txt', 'w')
+    f.write(mlatex(M)+'\n')
+    f.write(mlatex(G)+'\n')
+    f.write(mlatex(H)+'\n')
     # print("\nDerivative wrt to theta_d1", term1)
     # print()
+    final2 = M*Matrix([theta_dd1, theta_dd2, theta_dd3]) + G + H
 
+    print("Equality?? : ", simplify(final - final2) == 0)
     # For theta 1:
     # tau_11 = -1 * diff(K, theta1)
     # tau_12 = diff(P, theta1)
+
 
 
 

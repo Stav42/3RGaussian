@@ -28,12 +28,17 @@ class InvDynController {
         Eigen::Matrix3f KP, KD;
         
         Eigen::Vector3f ff_torque, fb_torque, total_torque;
+
+        Eigen::Matrix3f M;
+        Eigen::Vector3f G, H;
+
         
     public:
         InvDynController();
         Eigen::Vector3f get_ff_torque();
         Eigen::Vector3f get_fb_torque();
         Eigen::Vector3f get_total_torque();
+        Eigen::Vector3f get_ff();
 
 };
 
