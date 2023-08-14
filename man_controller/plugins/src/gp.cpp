@@ -67,15 +67,15 @@ Eigen::VectorXf GP_fit::get_Kn(Eigen::VectorXf new_state){
     return K_n;
 }
 
-Eigen::MatrixXf GP_fit::get_prediction(Eigen::Vector7f new_state){
+Eigen::MatrixXf GP_fit::get_prediction(Eigen::VectorXf new_state){
 
     Eigen::VectorXf K_n = get_Kn(new_state);
     mean = K_n * (K + Eigen::MatrixXf::identity(K.cols()) * sigma_w).inverse() * J;
     std_dev = kernel(new_state, new_state) - K_n * (K + Eigen::MatrixXf::identity(K.cols()) * sigma_w).inverse() * K_n.transpose();
 
     Eigen::MatrixXf result;
-    result = mean;
-    result(result.size() + 1) = std_dev;
+    result(0) = mean;
+    result(1) = mean;
 
     return result;
 }

@@ -14,6 +14,9 @@ namespace gazebo
 
     private: 
       InvDynController InvDyn;
+      GP_fit gp1;
+      GP_fit gp2;
+      GP_fit gp3;
       int count = 0;
       physics::ModelPtr model;
       event::ConnectionPtr updateConnection;
@@ -34,6 +37,7 @@ namespace gazebo
       man_controller::Traj joint_acc;
       float dt;
       Eigen::VectorXf torque;
+      Eigen::VectorXf state;
       gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     public: ManipulatorPlugin() {
@@ -66,8 +70,9 @@ namespace gazebo
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
 
-      
-
+      gp1 = GP_fit::GP_fit();
+      gp2 = GP_fit::GP_fit();
+      gp3 = GP_fit::GP_fit();
 
       joint1 = this->model->GetJoint("base_link_link_01");
       joint2 = this->model->GetJoint("link_01_link_02");
@@ -114,10 +119,10 @@ namespace gazebo
 
       this->InvDyn.joint_acc << acc.num1, acc.num2, acc.num3;
 
-      this->joint_vel.num1 = this->joint1->GetVelocity(0);
-      this->joint_vel.num2 = this->joint2->GetVelocity(0);
-      this->joint_vel.num3 = this->joint3->GetVelocity(0);
-      this->joint_vel.num4 = this->joint4->GetVelocity(0);
+      this->joint_vel.num1 = vel.num1;
+      this->joint_vel.num2 = vel.num2;
+      this->joint_vel.num3 = vel.num3;
+      this->joint_vel.num4 = vel.num4;
       this->joint_vel_publisher.publish(this->joint_vel);    
 
       this->joint_acc_publisher.publish(acc);
@@ -126,9 +131,7 @@ namespace gazebo
       // joint3->SetForce(0, torque[2]);
 
       // Sampling and fitting at 0.1 Hz
-      if(count%10 == 0){
-        
-      }
+
 
       std::cout<<"Current position: "<<this->InvDyn.joint_pos<<std::endl;
       this->torque = this->InvDyn.get_total_torque();
@@ -138,6 +141,39 @@ namespace gazebo
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
       
+      state(0) = pos1;
+      state(1) = pos2;
+      state(2) = pos3;
+      state(3) = vel.num1;
+      state(4) = vel.num2;
+      state(5) = vel.num3;
+
+      for(int i=0;i<3; i++){
+        state(6+i) = torque[i];
+      }
+      
+
+      if(count%10 == 0){
+        gp1.add_data(state);
+        gp2.add_data(state);
+        gp3.add_data(state);
+        flag = 1;
+      }
+
+      if(flag){
+        Eigen::VectorXf result1 = gp1.get_prediction(state);
+        mean1 = result1(0);
+        std_dev1 = result1(1);
+
+        Eigen::VectorXf result2 = gp2.get_prediction(state);
+        mean2 = result2(0);
+        std_dev2 = result2(1);
+
+        Eigen::VectorXf result3 = gp3.get_prediction(state);
+        mean3 = result3(0);
+        std_dev3 = result3(1);
+      }
+
       count++;
 
       ros::spinOnce();

@@ -11,9 +11,10 @@ class GP_fit{
         int states = 7;
         int pop_element = 0;
         float sigma_w = 10;
+        int flag = 0;
         Eigen::MatrixXf data_acc;
-        Eigen::VectorXf mean;
-        Eigen::VectorXf std_dev;
+        float mean;
+        float std_dev;
         Eigen::VectorXf robust_corr;
         Eigen::MatrixXf K;
         Eigen::MatrixXf Kn;
