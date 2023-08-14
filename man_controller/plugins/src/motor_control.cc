@@ -17,6 +17,7 @@ namespace gazebo
       GP_fit gp1;
       GP_fit gp2;
       GP_fit gp3;
+      int flag = 0;
       int count = 0;
       physics::ModelPtr model;
       event::ConnectionPtr updateConnection;
@@ -70,9 +71,9 @@ namespace gazebo
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
 
-      gp1 = GP_fit::GP_fit();
-      gp2 = GP_fit::GP_fit();
-      gp3 = GP_fit::GP_fit();
+      // gp1 = GP_fit::GP_fit();
+      // gp2 = GP_fit::GP_fit();
+      // gp3 = GP_fit::GP_fit();
 
       joint1 = this->model->GetJoint("base_link_link_01");
       joint2 = this->model->GetJoint("link_01_link_02");
@@ -141,37 +142,43 @@ namespace gazebo
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
       
-      state(0) = pos1;
-      state(1) = pos2;
-      state(2) = pos3;
-      state(3) = vel.num1;
-      state(4) = vel.num2;
-      state(5) = vel.num3;
-
-      for(int i=0;i<3; i++){
-        state(6+i) = torque[i];
-      }
+      state(0) = this-> InvDyn.joint_pos(0);
+      state(1) = this-> InvDyn.joint_pos(1);
+      state(2) = this-> InvDyn.joint_pos(2);
+      state(3) = this-> InvDyn.joint_vel(0);
+      state(4) = this-> InvDyn.joint_vel(1);
+      state(5) = this-> InvDyn.joint_vel(2);
       
 
       if(count%10 == 0){
-        gp1.add_data(state);
-        gp2.add_data(state);
-        gp3.add_data(state);
+        Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
+        state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
+
+        Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
+
+        gp1.add_data(state, obs(0));
+        gp2.add_data(state, obs(1));
+        gp3.add_data(state, obs(2));
         flag = 1;
       }
 
       if(flag){
         Eigen::VectorXf result1 = gp1.get_prediction(state);
-        mean1 = result1(0);
-        std_dev1 = result1(1);
+        this->gp1.mean = result1(0);
+        this->gp1.std_dev = result1(1);
 
         Eigen::VectorXf result2 = gp2.get_prediction(state);
-        mean2 = result2(0);
-        std_dev2 = result2(1);
+        this->gp2.mean = result2(0);
+        this->gp2.std_dev = result2(1);
 
         Eigen::VectorXf result3 = gp3.get_prediction(state);
-        mean3 = result3(0);
-        std_dev3 = result3(1);
+        this->gp3.mean = result3(0);
+        this->gp3.std_dev = result3(1);
+
+        std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
+        std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
+        std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
+        
       }
 
       count++;

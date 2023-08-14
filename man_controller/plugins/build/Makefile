@@ -533,6 +533,30 @@ src/ff_torque.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.s
 .PHONY : src/ff_torque.cpp.s
 
+src/gp.o: src/gp.cpp.o
+.PHONY : src/gp.o
+
+# target to build an object file
+src/gp.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/gp.cpp.o
+.PHONY : src/gp.cpp.o
+
+src/gp.i: src/gp.cpp.i
+.PHONY : src/gp.i
+
+# target to preprocess a source file
+src/gp.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/gp.cpp.i
+.PHONY : src/gp.cpp.i
+
+src/gp.s: src/gp.cpp.s
+.PHONY : src/gp.s
+
+# target to generate assembly for a file
+src/gp.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/gp.cpp.s
+.PHONY : src/gp.cpp.s
+
 src/motor_control.o: src/motor_control.cc.o
 .PHONY : src/motor_control.o
 
@@ -599,6 +623,9 @@ help:
 	@echo "... src/ff_torque.o"
 	@echo "... src/ff_torque.i"
 	@echo "... src/ff_torque.s"
+	@echo "... src/gp.o"
+	@echo "... src/gp.i"
+	@echo "... src/gp.s"
 	@echo "... src/motor_control.o"
 	@echo "... src/motor_control.i"
 	@echo "... src/motor_control.s"

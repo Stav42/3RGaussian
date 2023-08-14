@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o"
   "CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o.d"
+  "CMakeFiles/motor_plugin.dir/src/gp.cpp.o"
+  "CMakeFiles/motor_plugin.dir/src/gp.cpp.o.d"
   "CMakeFiles/motor_plugin.dir/src/motor_control.cc.o"
   "CMakeFiles/motor_plugin.dir/src/motor_control.cc.o.d"
   "libmotor_plugin.dylib"
