@@ -5,7 +5,7 @@
 #include <man_controller/Traj.h>
 #include <boost/bind.hpp>
 #include "ff_torque.h"
-
+#include "gp.h"
 
 namespace gazebo
 {
