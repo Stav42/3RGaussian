@@ -8,13 +8,14 @@
 class GP_fit{
     public:
         int max_size = 10;
-        int states = 7;
+        Eigen::VectorXf states;
         int pop_element = 0;
         float sigma_w = 10;
         float sigma_n = 10;
         Eigen::MatrixXf data_acc;
         float mean;
         float std_dev;
+        bool flag; 
         Eigen::VectorXf robust_corr;
         Eigen::MatrixXf K;
         Eigen::MatrixXf Kn;

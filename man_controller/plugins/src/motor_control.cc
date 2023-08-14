@@ -82,11 +82,14 @@ namespace gazebo
 
       this->dt = 0.1;
       std::cout<<"Works 1"<<std::endl;
+
+      state = Eigen::VectorXf::Zero(9);
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
     public: void OnUpdate(){
       // std::cout<<"Print if working"<<std::endl;
+      std::cout<<"Checkpoint 0"<<std::endl;
       this->joint_pos = man_controller::Traj();
 
       float pos1 = this->joint1->Position(0);
@@ -142,27 +145,29 @@ namespace gazebo
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
       
+      std::cout<<"Checkpoint 1"<<std::endl;
       state(0) = this-> InvDyn.joint_pos(0);
       state(1) = this-> InvDyn.joint_pos(1);
       state(2) = this-> InvDyn.joint_pos(2);
       state(3) = this-> InvDyn.joint_vel(0);
       state(4) = this-> InvDyn.joint_vel(1);
       state(5) = this-> InvDyn.joint_vel(2);
-      
+      std::cout<<"Checkpoint 2"<<std::endl;
 
-      if(count%10 == 0){
+      if(count%10 == 0 && count>0){
         Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
         state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
 
         Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
-
+        std::cout<<"Checkpoint 4"<<std::endl;
         gp1.add_data(state, obs(0));
         gp2.add_data(state, obs(1));
         gp3.add_data(state, obs(2));
-        flag = 1;
       }
 
-      if(flag){
+      std::cout<<"Checkpoint 3"<<std::endl;
+
+      if(gp1.flag){
         Eigen::VectorXf result1 = gp1.get_prediction(state);
         this->gp1.mean = result1(0);
         this->gp1.std_dev = result1(1);
@@ -180,6 +185,8 @@ namespace gazebo
         std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
         
       }
+
+      std::cout<<"Checkpoint 5"<<std::endl;
 
       count++;
 

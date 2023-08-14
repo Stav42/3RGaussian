@@ -8,15 +8,28 @@
 
 GP_fit::GP_fit(){
     max_size = 10;
-    M <<10, 0, 0, 0, 0, 0, 0,
-        0, 10, 0, 0, 0, 0, 0,
-        0, 0, 10, 0, 0, 0, 0,
-        0, 0, 0, 10, 0, 0, 0,
-        0, 0, 0, 0, 10, 0, 0,
-        0, 0, 0, 0, 0, 10, 0,
-        0, 0, 0, 0, 0, 0, 10;
+    
+    M = Eigen::MatrixXf::Zero(9, 9);
+
+    states = Eigen::VectorXf::Zero(9);
+
+    M <<10, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 10, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 10, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 10, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 10, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 10, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 10, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 10, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 10;
 
     sigma_n = 10;
+
+    data_acc = Eigen::MatrixXf(9, 0);
+
+    J = Eigen::VectorXf(0);
+    flag = 0;
+    K = Eigen::MatrixXf::Zero(max_size, max_size);
 
 }
 
@@ -40,46 +53,55 @@ Eigen::MatrixXf GP_fit::get_K(){
 }
 
 void GP_fit::add_data(Eigen::VectorXf states, float obs){
-    int size = data_acc.cols();
+    int size = data_acc.cols(); 
     int n_states = data_acc.rows();
     std::cout<<"Current size of the input data: "<<size<<std::endl;
 
     if(size<max_size){
+        std::cout<<"Checkpoint 8"<<std::endl;
         data_acc.conservativeResize(n_states, size+1);
-        data_acc.col(size+1) = states;
-        J(J.size() + 1) = obs;
+        std::cout<<"Checkpoint 9"<<" "<<data_acc.cols()<<std::endl;
+        data_acc.col(size) = states;
+        std::cout<<"Checkpoint 10"<<std::endl;
+        J.conservativeResize(J.size()+1);
+        std::cout<<"J size is "<<J.size()<<std::endl;
+        J(J.size()-1) = obs;
     } else {
+        std::cout<<"Checkpoint 6"<<std::endl;
         data_acc.col(pop_element) = states;
         J(pop_element) = obs;
         pop_element++;
         pop_element = pop_element%max_size;
+        std::cout<<"Checkpoint 7"<<std::endl;
+        flag = 1;
+        K = get_K();
     }
 
-    // Reconstructing K and kn matrices
-    K = get_K();
+    std::cout<<"Checkpoint 10"<<std::endl;
 
 }
 
 Eigen::VectorXf GP_fit::get_Kn(Eigen::VectorXf new_state){
-    Eigen::VectorXf K_n;
+    Eigen::VectorXf K_n(max_size);
     for(int i=0;i<data_acc.cols();i++){
         K_n(i) = kernel(new_state, data_acc.col(i));
     }
-
     return K_n;
 }
 
 Eigen::MatrixXf GP_fit::get_prediction(Eigen::VectorXf new_state){
 
+    std::cout<<"Checkpoint 11"<<std::endl;
     Eigen::VectorXf K_n = get_Kn(new_state);
-    Eigen::VectorXf mean1 = K_n.transpose() * (K + Eigen::MatrixXf::Identity(K.cols(), K.cols()) * sigma_w).inverse() * J;
+    mean = K_n.transpose() * (K + Eigen::MatrixXf::Identity(K.cols(), K.cols()) * sigma_w).inverse() * J;
+    std::cout<<"Checkpoint 12"<<std::endl;
     std_dev = kernel(new_state, new_state) - K_n.transpose() * (K + Eigen::MatrixXf::Identity(K.cols(), K.cols()) * sigma_w).inverse() * K_n;
 
-    std::cout<<"Type and size of mean and std_dev: "<<mean1.size()<<" "<<std_dev<<std::endl;
+    // std::cout<<"Type and size of mean and std_dev: "<<mean<<" "<<std_dev<<std::endl;
 
-    Eigen::MatrixXf result;
-    result(0) = 1.22;
-    result(1) = 1.22;
+    Eigen::VectorXf result(2);
+    result(0) = mean;
+    result(1) = std_dev;
 
     return result;
 }
