@@ -37,7 +37,7 @@ Eigen::MatrixXf GP_fit::get_K(){
     return K;
 }
 
-void GP_fit::add_data(Eigen::Vector7f states){
+void GP_fit::add_data(Eigen::Vector7f states, float obs){
     int size = data_acc.cols();
     int n_states = data_acc.rows();
     cout<<"Current size of the input data: "<<size<<std::endl;
@@ -45,22 +45,37 @@ void GP_fit::add_data(Eigen::Vector7f states){
     if(size<max_size){
         data_acc.conservativeResize(n_states, size+1)
         data_acc.col(size+1) = states;
+        J(J.size() + 1) = obs;
     } else {
         data_acc.col(pop_element) = states;
+        J(pop_element) = obs;
         pop_element++;
         pop_element = pop_element%max_size;
     }
 
     // Reconstructing K and kn matrices
     Eigen::MatrixXf = get_K();
-    
 
+}
+
+Eigen::VectorXf GP_fit::get_Kn(Eigen::VectorXf new_state){
+    Eigen::VectorXf K_n;
+    for(int i=0;i<acc_data.cols();i++){
+        K_n(i) = kernel(new_state, acc_data.col(i));
+    }
+
+    return K_n;
 }
 
 Eigen::MatrixXf GP_fit::get_prediction(Eigen::Vector7f new_state){
 
-}
+    Eigen::VectorXf K_n = get_Kn(new_state);
+    mean = K_n * (K + Eigen::MatrixXf::identity(K.cols()) * sigma_w).inverse() * J;
+    std_dev = kernel(new_state, new_state) - K_n * (K + Eigen::MatrixXf::identity(K.cols()) * sigma_w).inverse() * K_n.transpose();
 
-GP_fit::get_correction(){
+    Eigen::MatrixXf result;
+    result = mean;
+    result(result.size() + 1) = std_dev;
 
+    return result;
 }

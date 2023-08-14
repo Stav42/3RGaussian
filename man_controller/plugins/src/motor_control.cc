@@ -12,30 +12,30 @@ namespace gazebo
   class ManipulatorPlugin : public ModelPlugin
   {
 
-    private: InvDynController InvDyn;
-    private: physics::ModelPtr model;
-    private: event::ConnectionPtr updateConnection;
-    private: ros::NodeHandle* rosNode;
-    private: ros::Subscriber torque_sub;
-    private: ros::Subscriber ref_pos_sub;
-    private: ros::Subscriber ref_vel_sub;
-    private: ros::Subscriber ref_acc_sub;
-    private: ros::Publisher joint_pos_publisher;
-    private: ros::Publisher joint_vel_publisher;
-    private: ros::Publisher joint_acc_publisher;
-    private: physics::JointPtr joint1;
-    private: physics::JointPtr joint2;
-    private: physics::JointPtr joint3;
-    private: physics::JointPtr joint4;
-    private: man_controller::Traj joint_pos;
-    private: man_controller::Traj joint_vel;
-    private: man_controller::Traj joint_acc;
-    private: float dt;
-    private: Eigen::VectorXf torque;
-    private: gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
+    private: 
+      InvDynController InvDyn;
+      int count = 0;
+      physics::ModelPtr model;
+      event::ConnectionPtr updateConnection;
+      ros::NodeHandle* rosNode;
+      ros::Subscriber torque_sub;
+      ros::Subscriber ref_pos_sub;
+      ros::Subscriber ref_vel_sub;
+      ros::Subscriber ref_acc_sub;
+      ros::Publisher joint_pos_publisher;
+      ros::Publisher joint_vel_publisher;
+      ros::Publisher joint_acc_publisher;
+      physics::JointPtr joint1;
+      physics::JointPtr joint2;
+      physics::JointPtr joint3;
+      physics::JointPtr joint4;
+      man_controller::Traj joint_pos;
+      man_controller::Traj joint_vel;
+      man_controller::Traj joint_acc;
+      float dt;
+      Eigen::VectorXf torque;
+      gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
-    
-    
     public: ManipulatorPlugin() {
       if(!ros::isInitialized()){
         int argc = 0;
@@ -65,6 +65,8 @@ namespace gazebo
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
+
+      
 
 
       joint1 = this->model->GetJoint("base_link_link_01");
@@ -123,6 +125,11 @@ namespace gazebo
       // joint2->SetForce(0, torque[1]);
       // joint3->SetForce(0, torque[2]);
 
+      // Sampling and fitting at 0.1 Hz
+      if(count%10 == 0){
+        
+      }
+
       std::cout<<"Current position: "<<this->InvDyn.joint_pos<<std::endl;
       this->torque = this->InvDyn.get_total_torque();
       std::cout<<"Desired Position"<<this->InvDyn.joint_pos_ref<< std::endl;
@@ -131,6 +138,8 @@ namespace gazebo
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
       
+      count++;
+
       ros::spinOnce();
     }
 
