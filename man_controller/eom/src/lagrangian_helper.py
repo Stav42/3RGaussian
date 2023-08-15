@@ -64,8 +64,8 @@ functions = {
     'P23': P23(L2),
     'P34': P34(L3),
     'PC0': Matrix([0, 0, -1 * L1/2]),
-    'PC1': Matrix([L2/2,   0,    0]),
-    'PC2': Matrix([L3/2,   0,    0])
+    'PC1': Matrix([0,   -L2/2,    0]),
+    'PC2': Matrix([0,   -1 * L3/2,    0])
 }
 
 def outward_iteration(params):
@@ -84,6 +84,11 @@ def outward_iteration(params):
     v_dot_n = R * (params['w'].cross(P) + w_n.cross(w_n.cross(P)) + params['v_dot'])
 
     v_c_n = w_n.cross(P_C)  + v_n
+
+    # print("v_original_l for link ", new, ": ", v_n)
+    # print("w_original_l for link ", new, ": ", w_n)
+    # print("P_C for link ", new, "; ", P_C)
+
     v_c_dot_n = w_dot_n.cross( P_C) + w_n.cross(w_n.cross(P_C)) + v_dot_n
 
     F_n = mass['mass_'+str(new)] * v_c_dot_n

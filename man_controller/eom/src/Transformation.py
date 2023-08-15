@@ -18,8 +18,8 @@ def R12(p):
 
     R = Matrix([
         [cos(p['2']), -1 * sin(p['2']),   0],
-        [0,                0,             -1],
-        [sin(p['2']),      cos(p['2']),   0]
+        [0,                0,             1],
+        [-1 * sin(p['2']),      -1 * cos(p['2']),   0]
     ])
 
     return R
@@ -53,11 +53,11 @@ def P12():
     return p
 
 def P23(L2):
-    p = Matrix([L2, 0, 0])
+    p = Matrix([0, -1 * L2, 0])
     return p
 
 def P34(L3):
-    p = Matrix([L3, 0, 0])
+    p = Matrix([0, -L3, 0])
     return p
 
 def I1(params):

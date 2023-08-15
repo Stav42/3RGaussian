@@ -32,7 +32,7 @@ namespace gazebo
       physics::JointPtr joint1;
       physics::JointPtr joint2;
       physics::JointPtr joint3;
-      physics::JointPtr joint4;
+      // physics::JointPtr joint4;
       man_controller::Traj joint_pos;
       man_controller::Traj joint_vel;
       man_controller::Traj joint_acc;
@@ -78,7 +78,7 @@ namespace gazebo
       joint1 = this->model->GetJoint("base_link_link_01");
       joint2 = this->model->GetJoint("link_01_link_02");
       joint3 = this->model->GetJoint("link_02_link_03");
-      joint4 = this->model->GetJoint("link_03_link_04");
+      // joint4 = this->model->GetJoint("link_03_link_04");
 
       this->dt = 0.1;
       std::cout<<"Works 1"<<std::endl;
@@ -95,12 +95,12 @@ namespace gazebo
       float pos1 = this->joint1->Position(0);
       float pos2 = this->joint2->Position(0);
       float pos3 = this->joint3->Position(0);
-      float pos4 = this->joint4->Position(0);
+      // float pos4 = this->joint4->Position(0);
 
       this->joint_pos.num1 = pos1;
       this->joint_pos.num2 = pos2;
       this->joint_pos.num3 = pos3;
-      this->joint_pos.num4 = pos4;
+      this->joint_pos.num4 = 0;
       this->joint_pos_publisher.publish(this->joint_pos);
 
       this->InvDyn.joint_pos << pos1, pos2, pos3;
@@ -110,7 +110,7 @@ namespace gazebo
       vel.num1 = this->joint1->GetVelocity(0);
       vel.num2 = this->joint2->GetVelocity(0);
       vel.num3 = this->joint3->GetVelocity(0);
-      vel.num4 = this->joint4->GetVelocity(0);
+      vel.num4 = 0;
 
       this->InvDyn.joint_vel << vel.num1, vel.num2, vel.num3;
       
@@ -119,14 +119,15 @@ namespace gazebo
       acc.num1 = (vel.num1 - this->joint_vel.num1)/dt;
       acc.num2 = (vel.num2 - this->joint_vel.num2)/dt;
       acc.num3 = (vel.num3 - this->joint_vel.num3)/dt;
-      acc.num4 = (vel.num4 - this->joint_vel.num4)/dt;
+      // acc.num4 = (vel.num4 - this->joint_vel.num4)/dt;
+      acc.num4 = 0;
 
       this->InvDyn.joint_acc << acc.num1, acc.num2, acc.num3;
 
       this->joint_vel.num1 = vel.num1;
       this->joint_vel.num2 = vel.num2;
       this->joint_vel.num3 = vel.num3;
-      this->joint_vel.num4 = vel.num4;
+      this->joint_vel.num4 = 0;
       this->joint_vel_publisher.publish(this->joint_vel);    
 
       this->joint_acc_publisher.publish(acc);
@@ -145,48 +146,49 @@ namespace gazebo
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
       
-      std::cout<<"Checkpoint 1"<<std::endl;
-      state(0) = this-> InvDyn.joint_pos(0);
-      state(1) = this-> InvDyn.joint_pos(1);
-      state(2) = this-> InvDyn.joint_pos(2);
-      state(3) = this-> InvDyn.joint_vel(0);
-      state(4) = this-> InvDyn.joint_vel(1);
-      state(5) = this-> InvDyn.joint_vel(2);
-      std::cout<<"Checkpoint 2"<<std::endl;
+      // std::cout<<"Checkpoint 1"<<std::endl;
+      // state(0) = this-> InvDyn.joint_pos(0);
+      // state(1) = this-> InvDyn.joint_pos(1);
+      // state(2) = this-> InvDyn.joint_pos(2);
+      // state(3) = this-> InvDyn.joint_vel(0);
+      // state(4) = this-> InvDyn.joint_vel(1);
+      // state(5) = this-> InvDyn.joint_vel(2);
+      // // std::cout<<"Checkpoint 2"<<std::endl;
 
-      if(count%10 == 0 && count>0){
-        Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
-        state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
+      // if(count%10 == 0 && count>0){
+      //   Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
+      //   state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
 
-        Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
-        std::cout<<"Checkpoint 4"<<std::endl;
-        gp1.add_data(state, obs(0));
-        gp2.add_data(state, obs(1));
-        gp3.add_data(state, obs(2));
-      }
+      //   Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
+      //   // std::cout<<"Checkpoint 4"<<std::endl;
+      //   gp1.add_data(state, obs(0));
+      //   gp2.add_data(state, obs(1));
+      //   gp3.add_data(state, obs(2));
+      // }
 
-      std::cout<<"Checkpoint 3"<<std::endl;
+      // // std::cout<<"Checkpoint 3"<<std::endl;
 
-      if(gp1.flag){
-        Eigen::VectorXf result1 = gp1.get_prediction(state);
-        this->gp1.mean = result1(0);
-        this->gp1.std_dev = result1(1);
+      // if(gp1.flag && gp2.flag && gp3.flag){
+      //   std::cout<<"Size of K matrix"<<std::endl<<gp1.K<<std::endl;
+      //   Eigen::VectorXf result1 = gp1.get_prediction(state);
+      //   this->gp1.mean = result1(0);
+      //   this->gp1.std_dev = result1(1);
 
-        Eigen::VectorXf result2 = gp2.get_prediction(state);
-        this->gp2.mean = result2(0);
-        this->gp2.std_dev = result2(1);
+      //   Eigen::VectorXf result2 = gp2.get_prediction(state);
+      //   this->gp2.mean = result2(0);
+      //   this->gp2.std_dev = result2(1);
 
-        Eigen::VectorXf result3 = gp3.get_prediction(state);
-        this->gp3.mean = result3(0);
-        this->gp3.std_dev = result3(1);
+      //   Eigen::VectorXf result3 = gp3.get_prediction(state);
+      //   this->gp3.mean = result3(0);
+      //   this->gp3.std_dev = result3(1);
 
-        std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
-        std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
-        std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
+      //   std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
+      //   std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
+      //   std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
         
-      }
+      // }
 
-      std::cout<<"Checkpoint 5"<<std::endl;
+      // std::cout<<"Checkpoint 5"<<std::endl;
 
       count++;
 

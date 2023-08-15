@@ -38,6 +38,7 @@ def kinetic_energy(link):
     return ke
 
 def sum_of_ke(link1, link2, link3):
+    return kinetic_energy(link2) + kinetic_energy(link3)
     return kinetic_energy(link1) + kinetic_energy(link2) + kinetic_energy(link3)
 
 def potential_energy(link, T):
@@ -62,6 +63,7 @@ def sum_of_pe(link1, link2, link3):
     T12 = T(R12(theta), P12())
     T23 = T(R23(theta), P23(L2))
 
+    return  potential_energy(link2, T01 * T12) + potential_energy(link3, T01 * T12 * T23)
     return potential_energy(link1, T01) + potential_energy(link2, T01 * T12) + potential_energy(link3, T01 * T12 * T23)
 
 def gradient(f, params):
@@ -75,20 +77,27 @@ def main():
 
     links = obtain_links()
     link1 = links['link1']; link2 = links['link2']; link3 = links['link3']
+
+    print(link1['v_c'])
+    print(link2['v_c'])
+    print(link3['v_c'])
+
     K = sum_of_ke(link1, link2, link3)
     P = sum_of_pe(link1, link2, link3)
 
-    # print(P)
+    print("Total Potential: ", P)
+    print("Total Kinetic", K)
+    # print(sum_of_pe(link2, link3))
 
     L = K - P
     
     M = hessian(K, [theta_d1, theta_d2, theta_d3])
-    print("\n Mass Matrix: ", M)
+    # print("\n Mass Matrix: ", M)
     G = Matrix(gradient(P, [theta1, theta2, theta3]))
-    print("\n Gravity vector is: ", G)
+    # print("\n Gravity vector is: ", G)
     H = Matrix(gradient(K, [theta_d1, theta_d2, theta_d3])).jacobian(Matrix([theta1, theta2, theta3])) * Matrix([theta_d1, theta_d2, theta_d3]) - Matrix(gradient(K, [theta1, theta2, theta3]))
     # H = jacobian(gradient(K, [theta_d1, theta_d2, theta_d3]), [theta1, theta2, theta3]) * Matrix([theta_d1, theta_d2, theta_d3]) - gradient(K, [theta1, theta2, theta3])
-    print("\n NonLinear Term is: ", H)
+    # print("\n NonLinear Term is: ", H)
 
     #For theta1:
     term1 = diff(L, theta_d1)
@@ -118,11 +127,16 @@ def main():
     f.write(mlatex(M)+'\n')
     f.write(mlatex(G)+'\n')
     f.write(mlatex(H)+'\n')
+    f.write(mlatex(K)+'\n')
+    f.write(mlatex(P)+'\n')
+    
+    
+
     # print("\nDerivative wrt to theta_d1", term1)
     # print()
     final2 = M*Matrix([theta_dd1, theta_dd2, theta_dd3]) + G + H
 
-    print("Equality?? : ", simplify(final - final2) == 0)
+    # print("Equality?? : ", simplify(final - final2) == 0)
     # For theta 1:
     # tau_11 = -1 * diff(K, theta1)
     # tau_12 = diff(P, theta1)
