@@ -89,7 +89,6 @@ namespace gazebo
 
     public: void OnUpdate(){
       // std::cout<<"Print if working"<<std::endl;
-      std::cout<<"Checkpoint 0"<<std::endl;
       this->joint_pos = man_controller::Traj();
 
       float pos1 = this->joint1->Position(0);
@@ -138,55 +137,74 @@ namespace gazebo
       // Sampling and fitting at 0.1 Hz
 
 
-      std::cout<<"Current position: "<<this->InvDyn.joint_pos<<std::endl;
-      this->torque = this->InvDyn.get_total_torque();
-      std::cout<<"Desired Position"<<this->InvDyn.joint_pos_ref<< std::endl;
-      std::cout<<"Torque applied"<<this->torque<<std::endl;
+      // std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
+      // this->torque = this->InvDyn.get_total_torque();
+      // std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+      // // std::cout<<"Torque applied"<<this->torque<<std::endl;
+      // joint1->SetForce(0, torque[0]);
+      // joint2->SetForce(0, torque[1]);
+      // joint3->SetForce(0, torque[2]);
+      
+      // std::cout<<"Checkpoint 1"<<std::endl;
+      state(0) = this-> InvDyn.joint_pos(0);
+      state(1) = this-> InvDyn.joint_pos(1);
+      state(2) = this-> InvDyn.joint_pos(2);
+      state(3) = this-> InvDyn.joint_vel(0);
+      state(4) = this-> InvDyn.joint_vel(1);
+      state(5) = this-> InvDyn.joint_vel(2);
+      // std::cout<<"Checkpoint 2"<<std::endl;
+      Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
+      state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
+
+      if(count%10 == 0 && count>0){
+        std::cout<<"SAMPLING state is: "<<state<<std::endl;
+        // Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
+        // state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
+
+        Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
+        // std::cout<<"Checkpoint 4"<<std::endl;
+        gp1.add_data(state, obs(0));
+        gp2.add_data(state, obs(1));
+        gp3.add_data(state, obs(2));
+      }
+
+      // std::cout<<"Checkpoint 3"<<std::endl;
+
+      Eigen::Vector3f mean;
+      mean = Eigen::Vector3f::Zero();
+
+      if(gp1.flag && gp2.flag && gp3.flag & !(count%10==0)){
+        std::cout<<"State is: "<<state.transpose()<<std::endl;
+        std::cout<<"K matrix"<<std::endl<<gp1.K<<std::endl;
+        Eigen::VectorXf result1 = gp1.get_prediction(state);
+        this->gp1.mean = result1(0);
+        this->gp1.std_dev = result1(1);
+
+        Eigen::VectorXf result2 = gp2.get_prediction(state);
+        this->gp2.mean = result2(0);
+        this->gp2.std_dev = result2(1);
+
+        Eigen::VectorXf result3 = gp3.get_prediction(state);
+        this->gp3.mean = result3(0);
+        this->gp3.std_dev = result3(1);
+
+        std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
+        std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
+        std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
+        
+        mean(0) = gp1.mean;
+        mean(1) = gp2.mean;
+        mean(2) = gp3.mean;
+        
+      }
+
+      std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
+      this->torque = this->InvDyn.get_total_torque(mean);
+      std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+      // std::cout<<"Torque applied"<<this->torque<<std::endl;
       joint1->SetForce(0, torque[0]);
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
-      
-      // std::cout<<"Checkpoint 1"<<std::endl;
-      // state(0) = this-> InvDyn.joint_pos(0);
-      // state(1) = this-> InvDyn.joint_pos(1);
-      // state(2) = this-> InvDyn.joint_pos(2);
-      // state(3) = this-> InvDyn.joint_vel(0);
-      // state(4) = this-> InvDyn.joint_vel(1);
-      // state(5) = this-> InvDyn.joint_vel(2);
-      // // std::cout<<"Checkpoint 2"<<std::endl;
-
-      // if(count%10 == 0 && count>0){
-      //   Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
-      //   state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
-
-      //   Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
-      //   // std::cout<<"Checkpoint 4"<<std::endl;
-      //   gp1.add_data(state, obs(0));
-      //   gp2.add_data(state, obs(1));
-      //   gp3.add_data(state, obs(2));
-      // }
-
-      // // std::cout<<"Checkpoint 3"<<std::endl;
-
-      // if(gp1.flag && gp2.flag && gp3.flag){
-      //   std::cout<<"Size of K matrix"<<std::endl<<gp1.K<<std::endl;
-      //   Eigen::VectorXf result1 = gp1.get_prediction(state);
-      //   this->gp1.mean = result1(0);
-      //   this->gp1.std_dev = result1(1);
-
-      //   Eigen::VectorXf result2 = gp2.get_prediction(state);
-      //   this->gp2.mean = result2(0);
-      //   this->gp2.std_dev = result2(1);
-
-      //   Eigen::VectorXf result3 = gp3.get_prediction(state);
-      //   this->gp3.mean = result3(0);
-      //   this->gp3.std_dev = result3(1);
-
-      //   std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
-      //   std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
-      //   std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
-        
-      // }
 
       // std::cout<<"Checkpoint 5"<<std::endl;
 

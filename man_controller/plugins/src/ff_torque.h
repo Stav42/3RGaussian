@@ -37,8 +37,8 @@ class InvDynController {
         InvDynController();
         Eigen::Vector3f get_ff_torque();
         Eigen::Vector3f get_fb_torque();
-        Eigen::Vector3f get_total_torque();
-        Eigen::Vector3f get_ff();
+        Eigen::Vector3f get_total_torque(Eigen::Vector3f correction);
+        Eigen::Vector3f get_ff(Eigen::Vector3f correction);
 
 };
 

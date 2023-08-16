@@ -47,13 +47,13 @@ InvDynController::InvDynController(){
     L2 = 0.8;
     L3 = 0.8;
 
-    KP << 26.5948*30, 0, 0,
-          0, 26.59488*30, 0,
-          0, 0, 26.5948*30;
+    KP << 26.5948*50, 0, 0,
+          0, 26.59488*50, 0,
+          0, 0, 26.5948*50;
 
-    KD << 13.4173*0.5, 0, 0,
-          0, 13.4173*0.5, 0,
-          0, 0, 13.4173*0.5;
+    KD << 13.4173*1, 0, 0,
+          0, 13.4173*1, 0,
+          0, 0, 13.4173*1;
 
     ff_torque = Eigen::Vector3f::Zero();
     fb_torque = Eigen::Vector3f::Zero();
@@ -61,7 +61,7 @@ InvDynController::InvDynController(){
 
 }
 
-Eigen::Vector3f InvDynController::get_ff(){
+Eigen::Vector3f InvDynController::get_ff(Eigen::Vector3f correction){
     
     float g = 9.81;
 
@@ -88,11 +88,11 @@ Eigen::Vector3f InvDynController::get_ff(){
     //                     -1.0*I_2(0, 0)*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) + 1.0*I_2(1, 1)*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) - 1.0*I_3(0, 0)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) + 1.0*I_3(1, 1)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) - 0.25*L2*L2*m2*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) - 0.125*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*(4*L2*cos(joint_pos(1)) + 2*L3*cos(joint_pos(1) + joint_pos(2)))*joint_vel(0)*joint_vel(0) + (2.0*L2*L2*m3*sin(joint_pos(2))*cos(joint_pos(2))*joint_vel(1) - 0.5*L2*m3*(2*L2*cos(joint_pos(2)) + L3)*sin(joint_pos(2))*joint_vel(1) - 1.0*L2*m3*(L2*cos(joint_pos(2))*joint_vel(1) + L3*(joint_vel(1) + joint_vel(2))/2)*sin(joint_pos(2)))*joint_vel(2), 
     //                     -1.0*I_3(0, 0)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) + 1.0*I_3(1, 1)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) - 1.0*L2*L2*m3*sin(joint_pos(2))*cos(joint_pos(2))*joint_vel(1)*joint_vel(1) - 0.5*L2*L3*m3*sin(joint_pos(2))*joint_vel(1)*joint_vel(2) + 1.0*L2*m3*(L2*cos(joint_pos(2))*joint_vel(1) + L3*(joint_vel(1) + joint_vel(2))/2)*sin(joint_pos(2))*joint_vel(1) - 0.25*L3*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0);
 
-    Eigen::Vector3f ff = M * (joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel)) + G + H;
+    Eigen::Vector3f ff = M * (joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel) - correction) + G + H;
 
-    std::cout<<std::endl<<"This is G matrix: "<<G.transpose()<<std::endl;
-    std::cout<<std::endl<<"This is H matrix: "<<H.transpose()<<std::endl;
-    std::cout<<std::endl<<"This is M * terms matrix: "<<(M*(joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel))).transpose()<<std::endl;
+    // std::cout<<std::endl<<"This is G matrix: "<<G.transpose()<<std::endl;
+    // std::cout<<std::endl<<"This is H matrix: "<<H.transpose()<<std::endl;
+    // std::cout<<std::endl<<"This is M * terms matrix: "<<(M*(joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel))).transpose()<<std::endl;
     
 
     return ff;
@@ -113,13 +113,13 @@ Eigen::Vector3f InvDynController::get_fb_torque(){
     return fb_torque;
 
 };
-Eigen::Vector3f InvDynController::get_total_torque(){
+Eigen::Vector3f InvDynController::get_total_torque(Eigen::Vector3f correction){
     
     // if(!joint_pos_ref.isZero(0.001) && !joint_vel_ref.isZero(0.001) && !joint_acc_ref.isZero(0.001)){
             // torque = get_ff_torque() + get_fb_torque();
-    Eigen::Vector3f ff = get_ff();
+    Eigen::Vector3f ff = get_ff(correction);
     Eigen::Vector3f fb = get_fb_torque();
-    std::cout<<"Feedforward Torque from M"<<std::endl<<ff;
+    // std::cout<<"Feedforward Torque from M"<<std::endl<<ff;
     return ff;
     // return get_ff_torque() + get_fb_torque();
     // return get_fb_torque();
