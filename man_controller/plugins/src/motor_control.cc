@@ -39,6 +39,7 @@ namespace gazebo
       float dt;
       Eigen::VectorXf torque;
       Eigen::VectorXf state;
+      Eigen::VectorXf errors;
       gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     public: ManipulatorPlugin() {
@@ -84,6 +85,7 @@ namespace gazebo
       std::cout<<"Works 1"<<std::endl;
 
       state = Eigen::VectorXf::Zero(9);
+      errors = Eigen::VectorXf::Zero(0);
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
@@ -201,6 +203,15 @@ namespace gazebo
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+
+      Eigen::VectorXf error;
+      error = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
+      float err_norm = error.squaredNorm();
+
+      float size = errors.size();
+      errors.conservativeResize(size+1);
+      errors(size) = err_norms;
+
       // std::cout<<"Torque applied"<<this->torque<<std::endl;
       joint1->SetForce(0, torque[0]);
       joint2->SetForce(0, torque[1]);
