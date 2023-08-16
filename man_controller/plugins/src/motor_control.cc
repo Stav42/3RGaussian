@@ -3,6 +3,8 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <man_controller/Traj.h>
+#include <man_controller/FloatValue.h>
+#include <std_msgs/Float32.h>
 #include <boost/bind.hpp>
 #include "ff_torque.h"
 #include "gp.h"
@@ -26,9 +28,12 @@ namespace gazebo
       ros::Subscriber ref_pos_sub;
       ros::Subscriber ref_vel_sub;
       ros::Subscriber ref_acc_sub;
+
       ros::Publisher joint_pos_publisher;
       ros::Publisher joint_vel_publisher;
       ros::Publisher joint_acc_publisher;
+      ros::Publisher error_publisher;
+
       physics::JointPtr joint1;
       physics::JointPtr joint2;
       physics::JointPtr joint3;
@@ -71,6 +76,8 @@ namespace gazebo
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
+
+      this->error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/error", 1);
 
       // gp1 = GP_fit::GP_fit();
       // gp2 = GP_fit::GP_fit();
@@ -204,13 +211,18 @@ namespace gazebo
       this->torque = this->InvDyn.get_total_torque(mean);
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
+      man_controller::FloatValue err = man_controller::FloatValue();
+
       Eigen::VectorXf error;
       error = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
       float err_norm = error.squaredNorm();
 
-      float size = errors.size();
-      errors.conservativeResize(size+1);
-      errors(size) = err_norms;
+      err.value = err_norm;
+      // float size = errors.size();
+      // errors.conservativeResize(size+1);
+      // errors(size) = err_norm;
+
+      this->error_publisher.publish(err);
 
       // std::cout<<"Torque applied"<<this->torque<<std::endl;
       joint1->SetForce(0, torque[0]);

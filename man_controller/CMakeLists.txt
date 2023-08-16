@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Traj.msg
+  FloatValue.msg
 )
 
 generate_messages(

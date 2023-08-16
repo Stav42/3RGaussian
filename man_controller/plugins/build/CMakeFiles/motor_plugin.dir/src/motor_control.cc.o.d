@@ -3462,6 +3462,8 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: \
   /Users/stav.42/miniconda3/envs/ros_env/include/std_msgs/Float64.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/ros/message_operations.h \
   /Users/stav.42/ws/devel/.private/man_controller/include/man_controller/Traj.h \
+  /Users/stav.42/ws/devel/.private/man_controller/include/man_controller/FloatValue.h \
+  /Users/stav.42/miniconda3/envs/ros_env/include/std_msgs/Float32.h \
   /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/eigen3/Eigen/Dense \
   /Users/stav.42/miniconda3/envs/ros_env/include/eigen3/Eigen/Core \
@@ -3654,5 +3656,4 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: \
   /Users/stav.42/miniconda3/envs/ros_env/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/eigen3/Eigen/src/Eigenvalues/./RealQZ.h \
   /Users/stav.42/miniconda3/envs/ros_env/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  /Users/stav.42/miniconda3/envs/ros_env/include/std_msgs/Float32.h \
   /Users/stav.42/ws/src/man_controller/plugins/src/gp.h
