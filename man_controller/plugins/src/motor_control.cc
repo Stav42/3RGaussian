@@ -207,6 +207,8 @@ namespace gazebo
         
       }
 
+      // mean = Eigen::Vector3f::Zero();
+
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
@@ -218,9 +220,6 @@ namespace gazebo
       float err_norm = error.squaredNorm();
 
       err.value = err_norm;
-      // float size = errors.size();
-      // errors.conservativeResize(size+1);
-      // errors(size) = err_norm;
 
       this->error_publisher.publish(err);
 
@@ -236,9 +235,6 @@ namespace gazebo
       ros::spinOnce();
     }
 
-    // public: ignition::math::Vector3d format(data){
-    //   return torque;
-    // }
 
     public: void posCallback(const man_controller::Traj::ConstPtr& msg){
       
@@ -250,19 +246,6 @@ namespace gazebo
       double dt = 0.01;
 
       this->InvDyn.joint_pos_ref << joint1_pos, joint2_pos, joint3_pos;
-
-
-      // double error1 = joint1_pos - current_pos1;
-      // double error2 = joint2_pos - current_pos2;
-      // double error3 = joint3_pos - current_pos3;
-
-      // double cmd1 = pid.Update(error1, dt);
-      // double cmd2 = pid.Update(error2, dt);
-      // double cmd3 = pid.Update(error3, dt);
-
-      // joint1->SetForce(0, cmd1);
-      // joint2->SetForce(0, cmd2);
-      // joint3->SetForce(0, cmd3);
 
     }
 
