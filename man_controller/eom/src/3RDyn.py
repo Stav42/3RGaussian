@@ -27,13 +27,13 @@ R01 = Matrix([[cos(theta1), -sin(theta1), 0], [sin(theta1), cos(theta1), 0], [0,
 P01 = Matrix([0, 0, L1])
 T01 = Matrix([[cos(theta1), -sin(theta1), 0, 0], [sin(theta1), cos(theta1), 0, 0], [0, 0, 1, L1], [0, 0, 0, 1]])
 
-R12 = Matrix([[cos(theta2), -sin(theta2), 0], [0, 0, 1], [-sin(theta2), -cos(theta2), 0]])
+R12 = Matrix([[sin(theta2), -cos(theta2), 0], [0, 0, -1], [cos(theta2), sin(theta2), 0]])
 P12 = Matrix([0, 0, 0])
-T12 = Matrix([[cos(theta2), -sin(theta2), 0, 0], [0, 0, 1, 0], [-sin(theta2), -cos(theta2), 0, 0], [0, 0, 0, 1]])
+T12 = Matrix([[sin(theta2), -cos(theta2), 0, 0], [0, 0, -1, 0], [cos(theta2), sin(theta2), 0, 0], [0, 0, 0, 1]])
 
-R23 = Matrix([[cos(theta3), -sin(theta3), 0], [sin(theta3), cos(theta3), 0], [0, 0, 1]])
+R23 = Matrix([[cos(theta3), sin(theta3), 0], [-sin(theta3), cos(theta3), 0], [0, 0, 1]])
 P23 = Matrix([L2, 0, 0])
-T23 = Matrix([[cos(theta3), -sin(theta3), 0, L2], [sin(theta3), cos(theta3), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+T23 = Matrix([[cos(theta3), sin(theta3), 0, L2], [-sin(theta3), cos(theta3), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
 
 v00 = Matrix([0, 0, 0])
 w00 = Matrix([0, 0, 0])
@@ -58,12 +58,12 @@ v33 = R23.T * (v22 + w22.cross(P23))
 vc3 = v33 + w33.cross(Matrix([L3/2, 0, 0]))
 PC30_der = T01 * T12 * T23 * Matrix([L3/2, 0, 0, 1])
 I33 = Matrix([[I3_bar, 0, 0], [0, I3, 0], [0, 0, I3]])
-# print("\nPosition of COM3 wrt global frame: ", simplify(PC30_der))
+# print("\nPosition of COM2 wrt global frame: ", simplify(PC30_der))
 G = Matrix([0, 0, -g, 0])
 
-print("Velocity of COM1 in frame 1: ", vc1)
-print("\nVelocity of COM2 in frame 2: ", vc2)
-print("\nVelocity of COM3 in frame 3: ", simplify(vc3))
+# print("Velocity of COM1 in frame 1: ", vc1)
+# print("\nVelocity of COM2 in frame 2: ", vc2)
+# print("\nVelocity of COM3 in frame 3: ", simplify(vc3))
 
 KE_code = 0.5*m1*vc1.T*vc1 + 0.5*m2*vc2.T*vc2 + 0.5*m3*vc3.T*vc3 + 0.5 * w11.T * (I11 * w11) + 0.5 * w22.T * (I22 * w22) + 0.5 * w33.T * (I33 * w33)
 PE_code = -m1 * G.T * PC10 - m2 * G.T * PC20_der - m3 * G.T * PC30_der  

@@ -37,6 +37,10 @@ namespace gazebo
       physics::JointPtr joint1;
       physics::JointPtr joint2;
       physics::JointPtr joint3;
+
+      physics::LinkPtr link1;
+      physics::LinkPtr link2;
+      physics::LinkPtr link3;
       // physics::JointPtr joint4;
       man_controller::Traj joint_pos;
       man_controller::Traj joint_vel;
@@ -86,6 +90,11 @@ namespace gazebo
       joint1 = this->model->GetJoint("base_link_link_01");
       joint2 = this->model->GetJoint("link_01_link_02");
       joint3 = this->model->GetJoint("link_02_link_03");
+
+      link3 = this->model->GetLink("link_03");
+      link2 = this->model->GetLink("link_02");
+      link1 = this->model->GetLink("link_01");
+
       // joint4 = this->model->GetJoint("link_03_link_04");
 
       this->dt = 0.1;
@@ -213,6 +222,24 @@ namespace gazebo
       this->torque = this->InvDyn.get_total_torque(mean);
       std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+
+      Eigen::Vector3f com_pos;
+      
+      com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
+      // com_pos << this->InvDyn.L2*sin(this->InvDyn.joint_pos(1))*cos(this->InvDyn.joint_pos(0))/2, this->InvDyn.L2*sin(this->InvDyn.joint_pos(0))*sin(this->InvDyn.joint_pos(1))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1))/2;
+
+      std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
+      // std::cout<<"Positions sum are: "<<this->InvDyn.L1<<" "<< this->InvDyn.L2*sin(this->InvDyn.joint_pos(1))<<" "<<this->InvDyn.L3*cos(this->InvDyn.joint_pos(1)+this->InvDyn.joint_pos(2))/2<<std::endl;
+
+      // physics::InertialPtr inertial3 = link3->GetInertial();
+      ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
+
+      std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
+
+      // std::cout<<"Position according to Formula for Link2 COM: "<<com_pos.transpose()<<std::endl;
+      // ignition::math::Pose3d com = link2->WorldCoGPose(); // Center of Mass
+
+      // std::cout<<"Pose according to COG of link2 according to Gazebo API is: "<<com<<std::endl;
 
       man_controller::FloatValue err = man_controller::FloatValue();
 
