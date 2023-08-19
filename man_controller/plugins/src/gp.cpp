@@ -91,7 +91,7 @@ void GP_fit::add_data(Eigen::VectorXf states, float obs){
         // std::cout<<"Checkpoint 7"<<std::endl;
         flag = 1;
         K = get_K();
-        std::cout<<"K is: "<<std::endl<<K<<std::endl;
+        // std::cout<<"K is: "<<std::endl<<K<<std::endl;
     }
 
     // std::cout<<"Checkpoint 10"<<std::endl;
@@ -110,7 +110,7 @@ Eigen::MatrixXf GP_fit::get_prediction(Eigen::VectorXf new_state){
 
     // std::cout<<"Checkpoint 11"<<std::endl;
     Eigen::VectorXf K_n = get_Kn(new_state);
-    std::cout<<"J: \n"<<J.transpose()<<std::endl;
+    // std::cout<<"J: \n"<<J.transpose()<<std::endl;
     mean = K_n.transpose() * (K + Eigen::MatrixXf::Identity(K.cols(), K.cols()) * sigma_w).inverse() * J;
     // std::cout<<"Checkpoint 12"<<std::endl;
     std_dev = kernel(new_state, new_state) - K_n.transpose() * (K + Eigen::MatrixXf::Identity(K.cols(), K.cols()) * sigma_w).inverse() * K_n;

@@ -24,10 +24,10 @@ def talker():
                 vel_nums = map(float, vel_line.split())
                 acc_nums = map(float, acc_line.split())
 
-                # pos_nums = [0.3, 0.3, 0.3, 0]
-                # # acc_nums = 
-                # acc_nums = [0, 0, 0, 0]
-                # vel_nums = [0]*4 
+                pos_nums = [0.3, 0.3, 0.3, 0]
+                # acc_nums = 
+                acc_nums = [0, 0, 0, 0]
+                vel_nums = [0]*4 
                 # if len(pos_nums) == len(vel_nums) == len(acc_nums) == 4:  # Ensure there are 4 numbers on each line
                 pos_msg = Traj(*pos_nums)
                 vel_msg = Traj(*vel_nums)

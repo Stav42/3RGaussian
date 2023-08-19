@@ -207,10 +207,11 @@ namespace gazebo
         
       }
 
-      // mean = Eigen::Vector3f::Zero();
+      mean = Eigen::Vector3f::Zero();
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
+      std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
       man_controller::FloatValue err = man_controller::FloatValue();

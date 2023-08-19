@@ -24,6 +24,8 @@ class InvDynController {
 
         float L1, L2, L3;
         float m1, m2, m3;
+        float I1, I2, I3, I1_bar, I2_bar, I3_bar;
+        
 
         Eigen::Matrix3f KP, KD;
         
@@ -37,6 +39,7 @@ class InvDynController {
         InvDynController();
         Eigen::Vector3f get_ff_torque();
         Eigen::Vector3f get_fb_torque();
+        Eigen::Vector3f get_ff_upd(Eigen::Vector3f correction);
         Eigen::Vector3f get_total_torque(Eigen::Vector3f correction);
         Eigen::Vector3f get_ff(Eigen::Vector3f correction);
 
