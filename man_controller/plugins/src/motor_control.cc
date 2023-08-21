@@ -49,6 +49,10 @@ namespace gazebo
       Eigen::VectorXf torque;
       Eigen::VectorXf state;
       Eigen::VectorXf errors;
+
+      float accumulated_error = 0;
+      int count_rms = 0;
+
       gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     public: ManipulatorPlugin() {
@@ -216,7 +220,7 @@ namespace gazebo
         
       }
 
-      mean = Eigen::Vector3f::Zero();
+      // mean = Eigen::Vector3f::Zero();
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
@@ -246,6 +250,11 @@ namespace gazebo
       Eigen::VectorXf error;
       error = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
       float err_norm = error.squaredNorm();
+      accumulated_error += err_norm;
+      count_rms += 1;
+
+      std::cout<<"RMS error: "<<sqrt(accumulated_error/count_rms)<<std::endl;
+      std::cout<<"count: "<<count_rms<<std::endl;
 
       err.value = err_norm;
 
