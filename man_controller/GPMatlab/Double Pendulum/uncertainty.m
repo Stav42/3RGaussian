@@ -20,6 +20,9 @@ function [mu, rho] = uncertainty(xk, H)
             Kn(j, i) = val;
         end
     end
+
+    %% Hyperparameter tuning using Marginal Log Likelihood
+
     sigma_w = 0.01;
     Kn_ = Kn + eye(len) * sigma_w^2;
     mu = kn * (Kn_ \ y);
