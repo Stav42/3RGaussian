@@ -1,0 +1,9 @@
+function [M, C, G] = DOUBLE_PENDULUM_EOM(m1, m2, l1, l2)
+    g = 9.81;
+    M = @(q, qd) [m1 * l1^2 + m2 * (l1^2 + l2^2 + 2 * l1 * l2 * cos(q(2))), m2 * l1 * l2 * cos(q(2)) + m2 * l2^2; ...
+              m2 * l1 * l2 * cos(q(2)) + m2 * l2^2, m2 * l2^2];
+    C = @(q, qd) [-(m2 * l1 * l2 * sin(q(2))) * qd(2), -(m2 * l1 * l2 * sin(q(2))) * (qd(1) + qd(2)); ...
+                  (m2 * l1 * l2 * sin(q(2))) * q(1), 0];
+    G = @(q, qd) [m1 * l1 * g * cos(q(1)) + m2 * g * (l1 * cos(q(1)) + l2 * cos(q(1) + q(2))); ...
+              m2 * l2 * g * cos(q(1) + q(2))];
+end
