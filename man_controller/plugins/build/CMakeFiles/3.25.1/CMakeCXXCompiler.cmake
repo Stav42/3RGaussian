@@ -1,4 +1,4 @@
-set(CMAKE_CXX_COMPILER "/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++")
+set(CMAKE_CXX_COMPILER "/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++")
 set(CMAKE_CXX_COMPILER_ARG1 "")
 set(CMAKE_CXX_COMPILER_ID "Clang")
 set(CMAKE_CXX_COMPILER_VERSION "14.0.6")
@@ -22,11 +22,11 @@ set(CMAKE_CXX_SIMULATE_VERSION "")
 
 
 
-set(CMAKE_AR "/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ar")
+set(CMAKE_AR "/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-ar")
 set(CMAKE_CXX_COMPILER_AR "CMAKE_CXX_COMPILER_AR-NOTFOUND")
-set(CMAKE_RANLIB "/Users/stav.42/miniconda3/envs/ros_env/bin/llvm-ranlib")
+set(CMAKE_RANLIB "/Users/stav.42/miniconda3/envs/ros/bin/llvm-ranlib")
 set(CMAKE_CXX_COMPILER_RANLIB "CMAKE_CXX_COMPILER_RANLIB-NOTFOUND")
-set(CMAKE_LINKER "/Users/stav.42/miniconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld")
+set(CMAKE_LINKER "/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-ld")
 set(CMAKE_MT "")
 set(CMAKE_COMPILER_IS_GNUCXX )
 set(CMAKE_CXX_COMPILER_LOADED 1)
@@ -77,7 +77,7 @@ endif()
 
 
 
-set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros_env/include;/Users/stav.42/miniconda3/envs/ros_env/include/c++/v1;/Users/stav.42/miniconda3/envs/ros_env/lib/clang/14.0.6/include;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include")
+set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros/include/c++/v1;/Users/stav.42/miniconda3/envs/ros/lib/clang/14.0.6/include;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include")
 set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "c++")
 set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros_env/lib;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib")
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks")

@@ -44,10 +44,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /Users/stav.42/miniconda3/envs/ros_env/bin/cmake
+CMAKE_COMMAND = /Users/stav.42/miniconda3/envs/ros/bin/cmake
 
 # The command to remove a file.
-RM = /Users/stav.42/miniconda3/envs/ros_env/bin/cmake -E rm -f
+RM = /Users/stav.42/miniconda3/envs/ros/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =

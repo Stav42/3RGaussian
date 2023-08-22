@@ -1,1 +1,1 @@
-set(ORDERED_PATHS "/Users/stav.42/miniconda3/envs/ros_env/lib")
+set(ORDERED_PATHS "/Users/stav.42/miniconda3/envs/ros/lib")

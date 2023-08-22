@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-import GPy
+import gpflow
 import numpy as np
 from std_msgs.msg import Float64MultiArray
 
@@ -17,8 +17,11 @@ class GPFittingNode:
         self.prediction_pub = rospy.Publisher('gp_predictions', Float64MultiArray, queue_size=10)
 
         # Initialize GP model (you may need to adjust the kernel and other parameters)
-        self.kernel = GPy.kern.RBF(input_dim=9)
+        self.kernel = gpflow.kernels.RBF()
         self.gp_model = None
+
+
+        print("Hey whatsup")
 
         # Buffers for states and observations
         self.states_buffer = []
@@ -28,21 +31,24 @@ class GPFittingNode:
         rospy.Timer(rospy.Duration(0.1), self.fit_gp)
 
     def states_callback(self, msg):
+        print(msg.data)
         self.states_buffer.append(msg.data)
         if self.gp_model:
-            prediction = self.gp_model.predict(np.array(msg.data).reshape(-1, 1))
+            prediction = self.gp_model.predict_f(np.array(msg.data).reshape(-1, 1))
             prediction_msg = Float64MultiArray(data=prediction[0].flatten())
             self.prediction_pub.publish(prediction_msg)
 
     def observations_callback(self, msg):
+        # print()
         self.observations_buffer.append(msg.data)
 
     def fit_gp(self, event):
         if len(self.states_buffer) > 0 and len(self.observations_buffer) > 0:
             X = np.array(self.states_buffer).reshape(-1, 1)
             Y = np.array(self.observations_buffer).reshape(-1, 1)
-            self.gp_model = GPy.models.GPRegression(X, Y, self.kernel)
-            self.gp_model.optimize(messages=True)
+            self.gp_model = gpflow.models.GPR(data=(X, Y), kernel=self.kernel)
+            opt = gpflow.optimizers.Scipy()
+            opt.minimize(self.gp_model.training_loss, self.gp_model.trainable_variables)
             self.states_buffer = []
             self.observations_buffer = []
 

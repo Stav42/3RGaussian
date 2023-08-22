@@ -184,10 +184,10 @@ namespace gazebo
 
       std_msgs::Float64MultiArray gp_state;
       for(int i=0; i<9;i++){
-        gp_state[i] = state(i);
+        gp_state.data.push_back(state(i));
       }
 
-      gp_state_publisher.publish(gp_state)
+      gp_state_publisher.publish(gp_state);
 
       if(count%10 == 0 && count>0){
         std::cout<<"SAMPLING state is: "<<state<<std::endl;
