@@ -17,7 +17,7 @@ class GPFittingNode:
         self.prediction_pub = rospy.Publisher('gp_predictions', Float64MultiArray, queue_size=10)
 
         # Initialize GP model (you may need to adjust the kernel and other parameters)
-        self.kernel = GPy.kern.RBF(input_dim=1)
+        self.kernel = GPy.kern.RBF(input_dim=9)
         self.gp_model = None
 
         # Buffers for states and observations

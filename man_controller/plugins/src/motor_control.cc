@@ -5,6 +5,7 @@
 #include <man_controller/Traj.h>
 #include <man_controller/FloatValue.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <boost/bind.hpp>
 #include "ff_torque.h"
 #include "gp.h"
@@ -33,6 +34,7 @@ namespace gazebo
       ros::Publisher joint_vel_publisher;
       ros::Publisher joint_acc_publisher;
       ros::Publisher error_publisher;
+      ros::Publisher gp_state_publisher;
 
       physics::JointPtr joint1;
       physics::JointPtr joint2;
@@ -80,10 +82,12 @@ namespace gazebo
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      
+
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
+      this->gp_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/states_topic", 1);
+
 
       this->error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/error", 1);
 
@@ -177,6 +181,13 @@ namespace gazebo
       // std::cout<<"Checkpoint 2"<<std::endl;
       Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
       state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
+
+      std_msgs::Float64MultiArray gp_state;
+      for(int i=0; i<9;i++){
+        gp_state[i] = state(i);
+      }
+
+      gp_state_publisher.publish(gp_state)
 
       if(count%10 == 0 && count>0){
         std::cout<<"SAMPLING state is: "<<state<<std::endl;

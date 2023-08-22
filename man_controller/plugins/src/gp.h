@@ -4,7 +4,7 @@
 #include "std_msgs/Float32.h"
 #include <man_controller/Traj.h>
 #include <math.h>
-#include <nlopt.hpp>
+// #include <nlopt.hpp>
 #include <iostream>
 
 class GP_fit{
