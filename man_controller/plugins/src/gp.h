@@ -4,8 +4,6 @@
 #include "std_msgs/Float32.h"
 #include <man_controller/Traj.h>
 #include <math.h>
-// #include <nlopt.hpp>
-#include <iostream>
 
 class GP_fit{
     public:
@@ -27,9 +25,8 @@ class GP_fit{
         GP_fit();
         Eigen::MatrixXf get_prediction(Eigen::VectorXf new_state);
         Eigen::VectorXf get_Kn(Eigen::VectorXf new_state);
-        Eigen::MatrixXf get_K(std::vector<float> &params);
-        float kernel(Eigen::VectorXf d1, Eigen::VectorXf d2, std::vector<float> &params);
+        Eigen::MatrixXf get_K();
+        float kernel(Eigen::VectorXf d1, Eigen::VectorXf d2);
         void add_data(Eigen::VectorXf states, float obs);
-        std::vector<double> tune()
 
 };
