@@ -8,7 +8,7 @@ from std_msgs.msg import Float64MultiArray
 class GPFittingNode:
     def __init__(self):
 
-
+        self.buffer_size = 40
         # Buffers for states and observations
         self.states_buffer = []
         self.observation1_buffer = []
@@ -34,10 +34,10 @@ class GPFittingNode:
         
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(0.1), self.fit_gp)
+        rospy.Timer(rospy.Duration(1), self.fit_gp)
 
     def states_callback(self, msg):
-        if len(self.states_buffer)>=20:
+        if len(self.states_buffer)>=self.buffer_size:
             self.states_buffer.append(msg.data)
             self.states_buffer.pop(0)
         else:
@@ -60,7 +60,7 @@ class GPFittingNode:
 
     def observations_callback(self, msg):
 
-        if len(self.observation1_buffer) >= 20:
+        if len(self.observation1_buffer) >= self.buffer_size:
             self.observation1_buffer.append(msg.data[0])
             self.observation1_buffer.pop(0)
             self.observation2_buffer.append(msg.data[1])
@@ -78,7 +78,7 @@ class GPFittingNode:
     def fit_gp(self, event):
 
         print("Calling fitting function")
-        if len(self.states_buffer) == 20 and len(self.observation1_buffer) > 0 and len(self.observation2_buffer) > 0 and len(self.observation3_buffer) > 0:
+        if len(self.states_buffer) == self.buffer_size and len(self.observation1_buffer) > 0 and len(self.observation2_buffer) > 0 and len(self.observation3_buffer) > 0:
             # X = np.array(self.states_buffer).reshape(-1, 1)
             X = np.array(self.states_buffer)
             Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
