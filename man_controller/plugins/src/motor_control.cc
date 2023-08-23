@@ -54,6 +54,10 @@ namespace gazebo
       Eigen::VectorXf torque;
       Eigen::VectorXf state;
       Eigen::VectorXf errors;
+      Eigen::VectorXf gp_mean;
+
+      // std::vector<float> gp_mean(3);
+      // std::vector<float> gp_stddev(3);
 
       float accumulated_error = 0;
       int count_rms = 0;
@@ -85,7 +89,7 @@ namespace gazebo
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_pred = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::predCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
 
 
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
@@ -116,6 +120,7 @@ namespace gazebo
 
       state = Eigen::VectorXf::Zero(9);
       errors = Eigen::VectorXf::Zero(0);
+      gp_mean = Eigen::VectorXf::Zero(3);
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
@@ -244,7 +249,8 @@ namespace gazebo
         
       }
 
-      // mean = Eigen::Vector3f::Zero();
+      mean = Eigen::Vector3f::Zero();
+      mean = gp_mean;
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
@@ -254,21 +260,12 @@ namespace gazebo
       Eigen::Vector3f com_pos;
       
       com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
-      // com_pos << this->InvDyn.L2*sin(this->InvDyn.joint_pos(1))*cos(this->InvDyn.joint_pos(0))/2, this->InvDyn.L2*sin(this->InvDyn.joint_pos(0))*sin(this->InvDyn.joint_pos(1))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1))/2;
 
       std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
-      // std::cout<<"Positions sum are: "<<this->InvDyn.L1<<" "<< this->InvDyn.L2*sin(this->InvDyn.joint_pos(1))<<" "<<this->InvDyn.L3*cos(this->InvDyn.joint_pos(1)+this->InvDyn.joint_pos(2))/2<<std::endl;
 
-      // physics::InertialPtr inertial3 = link3->GetInertial();
       ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
 
       std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
-
-      // std::cout<<"Position according to Formula for Link2 COM: "<<com_pos.transpose()<<std::endl;
-      // ignition::math::Pose3d com = link2->WorldCoGPose(); // Center of Mass
-
-      // std::cout<<"Pose according to COG of link2 according to Gazebo API is: "<<com<<std::endl;
-
       man_controller::FloatValue err = man_controller::FloatValue();
 
       Eigen::VectorXf error;
@@ -296,6 +293,15 @@ namespace gazebo
       ros::spinOnce();
     }
 
+    public: void predCallback(const std_msgs::Float64MultiArray::ConstPtr &msg){
+      float mean1 = msg->data[0];
+      float mean2 = msg->data[1];
+      float mean3 = msg->data[2];
+      
+      gp_mean(0) = mean1;
+      gp_mean(1) = mean2;
+      gp_mean(2) = mean3;
+    }
 
     public: void posCallback(const man_controller::Traj::ConstPtr& msg){
       
