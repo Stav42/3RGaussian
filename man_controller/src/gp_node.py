@@ -9,7 +9,7 @@ from scipy.linalg import solve_continuous_are
 class GPFittingNode:
     def __init__(self):
 
-        self.buffer_size = 25
+        self.buffer_size = 10
         # Buffers for states and observations
         self.states_buffer = []
         self.observation1_buffer = []
@@ -23,10 +23,12 @@ class GPFittingNode:
 
         rospy.init_node('gp_fitting_node')
 
+        print("Node started")
+
         # Subscribe to the topics for states and observations
         rospy.Subscriber('states_topic', Float64MultiArray, self.states_callback)
-        rospy.Subscriber('error_states', Float64MultiArray, self.states_callback)
-        rospy.Subscriber('observations_topic', Float64MultiArray, self.errors_callback)
+        rospy.Subscriber('error_states', Float64MultiArray, self.errors_callback)
+        rospy.Subscriber('observations_topic', Float64MultiArray, self.observations_callback)
 
         # Publisher for predictions
         self.prediction_pub = rospy.Publisher('gp_predictions', Float64MultiArray, queue_size=10)
@@ -38,7 +40,9 @@ class GPFittingNode:
         # Timer for fitting GP at 10 Hz
         rospy.Timer(rospy.Duration(0.1), self.fit_gp)
 
-    def get_correction(mean1, mean2, mean3, var1, var2, var3, error):
+    def get_correction(self, mean1, mean2, mean3, var1, var2, var3, error):
+
+        print("Obtaining correction")
         
         rho1 = max(abs(mean1 - 2.5*var1), abs(mean1 + 2.5*var1))
         rho2 = max(abs(mean2 - 2.5*var2), abs(mean2 + 2.5*var2))
@@ -48,9 +52,9 @@ class GPFittingNode:
         rho = rho**0.5
 
         B = np.zeros([6, 3])
-        B[3:5, 0:2] = np.identity(3)
+        B[3:6, 0:3] = np.identity(3)
 
-        print(B)
+        # print(B)
         K_P = np.array([[26.5948*9, 0, 0], 
                         [0, 26.5948*9, 0], 
                         [0, 0, 26.5948*9]])
@@ -61,15 +65,15 @@ class GPFittingNode:
         
 
         A = np.zeros([6, 6])
-        A[3:5, 0:2] = -K_P
-        A[3:5, 3:5] = -K_D
-        A[0:2, 3:5] = np.identity(3)
+        A[3:6, 0:3] = -K_P
+        A[3:6, 3:6] = -K_D
+        A[0:3, 3:6] = np.identity(3)
         epsilon = 0.001
         Q = np.identity(6)
 
-        P = solve_continuous_are(a = A, b = np.zeros([6, 6]), r = np.identity(6))
+        P = solve_continuous_are(a = A, b = np.zeros([6, 6]), r = np.identity(6), q = Q)
 
-        w =  B.T * P * error
+        w =  B.T @ P @ error
         if np.linalg.norm(w)>epsilon:
             r = -rho * w/np.linalg.norm(w)
         else:
@@ -78,6 +82,9 @@ class GPFittingNode:
         return r
 
     def states_callback(self, msg):
+        
+        # print("Calling state callback")
+
         if len(self.states_buffer)>=self.buffer_size:
             self.states_buffer.append(msg.data)
             self.states_buffer.pop(0)
@@ -100,7 +107,9 @@ class GPFittingNode:
             print("Error is: ", error)
 
             correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
-            correction_val = Float64MultiArray(data = [correction[0], correction[1], correction[2]])
+            print(correction.numpy())
+            correction = correction.numpy()
+            correction_val = Float64MultiArray(data = [correction[0][0], correction[0][1], correction[0][2]])
 
             prediction = Float64MultiArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
             
@@ -108,6 +117,8 @@ class GPFittingNode:
             self.prediction_pub.publish(prediction)
 
     def observations_callback(self, msg):
+
+        # print("Observation Callback")
 
         if len(self.observation1_buffer) >= self.buffer_size:
             self.observation1_buffer.append(msg.data[0])
@@ -125,6 +136,7 @@ class GPFittingNode:
 
     def errors_callback(self, msg):
 
+        # print("Error state callback")
         if len(self.error_buffer) >= self.buffer_size:
             self.error_buffer.append(msg.data)
             self.error_buffer.pop(0)

@@ -30,12 +30,15 @@ namespace gazebo
       ros::Subscriber ref_vel_sub;
       ros::Subscriber ref_acc_sub;
       ros::Subscriber gp_pred;
+      ros::Subscriber gp_corr;
+
 
       ros::Publisher joint_pos_publisher;
       ros::Publisher joint_vel_publisher;
       ros::Publisher joint_acc_publisher;
       ros::Publisher error_publisher;
       ros::Publisher gp_state_publisher;
+      ros::Publisher error_state_publisher;
 
       ros::Publisher gp_observations_publisher;
 
@@ -126,6 +129,8 @@ namespace gazebo
       state = Eigen::VectorXf::Zero(9);
       errors = Eigen::VectorXf::Zero(0);
       gp_mean = Eigen::VectorXf::Zero(3);
+
+      corr = Eigen::VectorXf::Zero(3);
       // this->sub = this->rosNode->subscribe('/reference_trajectory', 1, &ManipulatorPlugin::callback, this);
     }
 
@@ -205,18 +210,18 @@ namespace gazebo
       }
 
       Eigen::VectorXf error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
-      Eigen::VectorXf error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_pos_vel;
+      Eigen::VectorXf error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_vel_ref;
       
 
       std_msgs::Float64MultiArray error_state;
       for(int i=0; i<6;i++){
-        if i<3:
+        if(i<3)
           error_state.data.push_back(error_state_gp(i));
-        else:
+        else
           error_state.data.push_back(error_dot_state_gp(i-3));
       }
 
-      error_state_publisher.publish(error_state)
+      error_state_publisher.publish(error_state);
       gp_state_publisher.publish(gp_state);
 
       if(count%10 == 0 && count>0){
