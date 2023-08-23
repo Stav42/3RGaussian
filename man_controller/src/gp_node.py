@@ -44,13 +44,13 @@ class GPFittingNode:
         if self.gp_model1 and self.gp_model2 and self.gp_model3:
             data = np.expand_dims(np.array(msg.data), axis=0)
              
-            print(data.shape)
+            # print(data.shape)
 
             mean1, var1 = self.gp_model1.predict_f(data)
             mean2, var2 = self.gp_model2.predict_f(data)
             mean3, var3 = self.gp_model3.predict_f(data)
 
-            print("\npredicted data is: ", mean1.numpy()[0][0])
+            # print("\npredicted data is: ", mean1.numpy()[0][0])
 
             prediction = Float64MultiArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
 
@@ -75,7 +75,7 @@ class GPFittingNode:
 
     def fit_gp(self, event):
 
-        print("Calling fitting function")
+        # print("Calling fitting function")
         if len(self.states_buffer) == self.buffer_size and len(self.observation1_buffer) > 0 and len(self.observation2_buffer) > 0 and len(self.observation3_buffer) > 0:
             # X = np.array(self.states_buffer).reshape(-1, 1)
             X = np.array(self.states_buffer)
@@ -83,7 +83,7 @@ class GPFittingNode:
             Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
             Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
 
-            print(Y1)
+            # print(Y1)
 
             self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
             self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)

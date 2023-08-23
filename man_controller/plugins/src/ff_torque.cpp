@@ -23,6 +23,8 @@ InvDynController::InvDynController(){
     KP = Eigen::Matrix3f::Zero();
     KD = Eigen::Matrix3f::Zero();
 
+    M = Eigen::Matrix3f::Zero();
+
     Eigen::Matrix3f M;
     Eigen::Vector3f G, H;
 
@@ -79,13 +81,13 @@ InvDynController::InvDynController(){
     
 
 
-    KP << 26.5948*5*16, 0, 0,
-          0, 26.59488*5*16, 0,
-          0, 0, 26.5948*5*16;
+    KP << 26.5948*5, 0, 0,
+          0, 26.59488*5, 0,
+          0, 0, 26.5948*5;
 
-    KD << 23.0629*4, 0, 0,
-          0, 23.0629*4, 0,
-          0, 0, 23.0629*4;
+    KD << 23.0629, 0, 0,
+          0, 23.0629, 0,
+          0, 0, 23.0629;
 
     ff_torque = Eigen::Vector3f::Zero();
     fb_torque = Eigen::Vector3f::Zero();
@@ -96,8 +98,8 @@ InvDynController::InvDynController(){
 Eigen::Vector3f InvDynController::get_ff_upd(Eigen::Vector3f correction){
     float g = 9.81;
 
-    Eigen::Matrix3f M;
-    M<<1.0*I1_bar + 1.0*I2*sin(joint_pos(1))*sin(joint_pos(1)) + 1.0*I2_bar*cos(joint_pos(1))*cos(joint_pos(1)) + 1.0*I3*sin(joint_pos(1) + joint_pos(2))*sin(joint_pos(1) + joint_pos(2)) + 1.0*I3_bar*cos(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2)) + 0.25*L2*L2*m2*sin(joint_pos(1))*sin(joint_pos(1)) + 0.25*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2))), 0, 0, 0, 1.0*I2 + 1.0*I3 + 0.25*L2*L2*m2 + 1.0*L2*L2*m3 + 1.0*L2*L3*m3*cos(joint_pos(2)) + 0.25*L3*L3*m3, 1.0*I3 + 0.25*L3*m3*(2*L2*cos(joint_pos(2)) + L3) , 0, 1.0*I3 + 0.25*L3*m3*(2*L2*cos(joint_pos(2)) + L3), 1.0*I3 + 0.25*L3*L3*m3;
+    Eigen::Matrix3f M_temp;
+    M_temp<<1.0*I1_bar + 1.0*I2*sin(joint_pos(1))*sin(joint_pos(1)) + 1.0*I2_bar*cos(joint_pos(1))*cos(joint_pos(1)) + 1.0*I3*sin(joint_pos(1) + joint_pos(2))*sin(joint_pos(1) + joint_pos(2)) + 1.0*I3_bar*cos(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2)) + 0.25*L2*L2*m2*sin(joint_pos(1))*sin(joint_pos(1)) + 0.25*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2))), 0, 0, 0, 1.0*I2 + 1.0*I3 + 0.25*L2*L2*m2 + 1.0*L2*L2*m3 + 1.0*L2*L3*m3*cos(joint_pos(2)) + 0.25*L3*L3*m3, 1.0*I3 + 0.25*L3*m3*(2*L2*cos(joint_pos(2)) + L3) , 0, 1.0*I3 + 0.25*L3*m3*(2*L2*cos(joint_pos(2)) + L3), 1.0*I3 + 0.25*L3*L3*m3;
     // std::cout<<"Testing terms "<<0.25*m3*(2*L2*cos(joint_pos(1)) +  L3*cos(joint_pos(1) + joint_pos(2)))<<std::endl;
     // std::cout<<"Constituents of the above value: "<< 0.25*L2*L2*m2 <<std::endl;
     // std::cout<<"Constituents of the above value: "<< cos(joint_pos(1))*cos(joint_pos(1)) <<std::endl;
@@ -105,6 +107,8 @@ Eigen::Vector3f InvDynController::get_ff_upd(Eigen::Vector3f correction){
     // std::cout<<"Constituents of the above value: "<< 1.0*I3*cos(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2)) + 1.0*I3_bar*sin(joint_pos(1) + joint_pos(2))*sin(joint_pos(1) + joint_pos(2))<<std::endl;
     
     // std::cout<<"Testing values: "<<I1<<" huhu"<<I2<<"lulu "<<I3<<" susu"<<joint_pos(0)<<"cucu "<<joint_pos(1)<<" apap"<<joint_pos(2)<<" jsj"<<I1_bar<<"qwqw "<<I2_bar<<"bhbhb "<<I3_bar<<"bhbh "<<std::endl;
+
+    M = M_temp;
 
     Eigen::Vector3f G;
     G<<0, -g*(L2*m2*sin(joint_pos(1)) + 2*L2*m3*sin(joint_pos(1)) + L3*m3*sin(joint_pos(1) + joint_pos(2)))/2, -L3*g*m3*sin(joint_pos(1) + joint_pos(2))/2;

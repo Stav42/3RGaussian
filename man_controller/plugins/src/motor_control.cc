@@ -191,6 +191,7 @@ namespace gazebo
       state(5) = this-> InvDyn.joint_vel(2);
       // std::cout<<"Checkpoint 2"<<std::endl;
       Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
+      std::cout<<"Commanded acc is: "<<eta_acc.transpose()<<std::endl;
       state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
 
       std_msgs::Float64MultiArray gp_state;
@@ -201,7 +202,6 @@ namespace gazebo
       gp_state_publisher.publish(gp_state);
 
       if(count%10 == 0 && count>0){
-        std::cout<<"SAMPLING state is: "<<state<<std::endl;
         // Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
         // state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
 
@@ -211,6 +211,8 @@ namespace gazebo
         gp2.add_data(state, obs(1));
         gp3.add_data(state, obs(2));
       }
+
+      std::cout<<"Actual acc is: "<<this->InvDyn.joint_acc.transpose()<<std::endl;
 
       Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
       std_msgs::Float64MultiArray gp_obs;
@@ -222,7 +224,7 @@ namespace gazebo
       gp_observations_publisher.publish(gp_obs);
 
       Eigen::Vector3f mean;
-      mean = Eigen::Vector3f::Zero();
+      // mean = Eigen::Vector3f::Zero();
 
       if(gp1.flag && gp2.flag && gp3.flag & !(count%10==0)){
         // std::cout<<"State is: "<<state.transpose()<<std::endl;
@@ -248,7 +250,8 @@ namespace gazebo
         mean(2) = gp3.mean;
         
       }
-
+      std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
+      std::cout<<"Torque correction is: "<<this->InvDyn.M * gp_mean<<std::endl;
       mean = Eigen::Vector3f::Zero();
       mean = gp_mean;
 
@@ -281,7 +284,7 @@ namespace gazebo
 
       this->error_publisher.publish(err);
 
-      // std::cout<<"Torque applied"<<this->torque<<std::endl;
+      std::cout<<"Torque applied"<<this->torque<<std::endl;
       joint1->SetForce(0, torque[0]);
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);
