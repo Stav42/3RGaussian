@@ -31,8 +31,6 @@ class GPFittingNode:
         # Initialize GP model (you may need to adjust the kernel and other parameters)
         self.kernel = gpflow.kernels.RBF()
 
-        
-
         # Timer for fitting GP at 10 Hz
         rospy.Timer(rospy.Duration(1), self.fit_gp)
 
@@ -84,6 +82,8 @@ class GPFittingNode:
             Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
             Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
             Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
+
+            print(Y1)
 
             self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
             self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)

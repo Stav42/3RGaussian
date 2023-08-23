@@ -214,9 +214,9 @@ namespace gazebo
 
       Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
       std_msgs::Float64MultiArray gp_obs;
-      
+      std::cout<<"Eta is: "<<obs.transpose()<<std::endl;
       for(int i=0; i<3;i++){
-        gp_obs.data.push_back(state(i));
+        gp_obs.data.push_back(obs(i));
       }
 
       gp_observations_publisher.publish(gp_obs);
@@ -225,8 +225,8 @@ namespace gazebo
       mean = Eigen::Vector3f::Zero();
 
       if(gp1.flag && gp2.flag && gp3.flag & !(count%10==0)){
-        std::cout<<"State is: "<<state.transpose()<<std::endl;
-        std::cout<<"K matrix"<<std::endl<<gp1.K<<std::endl;
+        // std::cout<<"State is: "<<state.transpose()<<std::endl;
+        // std::cout<<"K matrix"<<std::endl<<gp1.K<<std::endl;
         Eigen::VectorXf result1 = gp1.get_prediction(state);
         this->gp1.mean = result1(0);
         this->gp1.std_dev = result1(1);
@@ -239,9 +239,9 @@ namespace gazebo
         this->gp3.mean = result3(0);
         this->gp3.std_dev = result3(1);
 
-        std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
-        std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
-        std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
+        // std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
+        // std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
+        // std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
         
         mean(0) = gp1.mean;
         mean(1) = gp2.mean;
@@ -254,18 +254,18 @@ namespace gazebo
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       this->torque = this->InvDyn.get_total_torque(mean);
-      std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
+      // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
       Eigen::Vector3f com_pos;
       
       com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
 
-      std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
+      // std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
 
       ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
 
-      std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
+      // std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
       man_controller::FloatValue err = man_controller::FloatValue();
 
       Eigen::VectorXf error;
@@ -274,8 +274,8 @@ namespace gazebo
       accumulated_error += err_norm;
       count_rms += 1;
 
-      std::cout<<"RMS error: "<<sqrt(accumulated_error/count_rms)<<std::endl;
-      std::cout<<"count: "<<count_rms<<std::endl;
+      // std::cout<<"RMS error: "<<sqrt(accumulated_error/count_rms)<<std::endl;
+      // std::cout<<"count: "<<count_rms<<std::endl;
 
       err.value = err_norm;
 
