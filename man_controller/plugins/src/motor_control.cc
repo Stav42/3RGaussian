@@ -29,12 +29,15 @@ namespace gazebo
       ros::Subscriber ref_pos_sub;
       ros::Subscriber ref_vel_sub;
       ros::Subscriber ref_acc_sub;
+      ros::Subscriber gp_pred;
 
       ros::Publisher joint_pos_publisher;
       ros::Publisher joint_vel_publisher;
       ros::Publisher joint_acc_publisher;
       ros::Publisher error_publisher;
       ros::Publisher gp_state_publisher;
+
+      ros::Publisher gp_observations_publisher;
 
       physics::JointPtr joint1;
       physics::JointPtr joint2;
@@ -82,12 +85,15 @@ namespace gazebo
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+
 
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
       this->gp_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/states_topic", 1);
 
+      this->gp_observations_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/observations_topic", 1);
 
       this->error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/error", 1);
 
@@ -201,7 +207,14 @@ namespace gazebo
         gp3.add_data(state, obs(2));
       }
 
-      // std::cout<<"Checkpoint 3"<<std::endl;
+      Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
+      std_msgs::Float64MultiArray gp_obs;
+      
+      for(int i=0; i<3;i++){
+        gp_obs.data.push_back(state(i));
+      }
+
+      gp_observations_publisher.publish(gp_obs);
 
       Eigen::Vector3f mean;
       mean = Eigen::Vector3f::Zero();
