@@ -4,16 +4,18 @@ import rospy
 import gpflow
 import numpy as np
 from std_msgs.msg import Float64MultiArray
+from scipy.linalg import solve_continuous_are
 
 class GPFittingNode:
     def __init__(self):
 
-        self.buffer_size = 40
+        self.buffer_size = 25
         # Buffers for states and observations
         self.states_buffer = []
         self.observation1_buffer = []
         self.observation2_buffer = []
         self.observation3_buffer = []
+        self.error_buffer = []
 
         self.gp_model1 = None
         self.gp_model2 = None
@@ -23,16 +25,57 @@ class GPFittingNode:
 
         # Subscribe to the topics for states and observations
         rospy.Subscriber('states_topic', Float64MultiArray, self.states_callback)
-        rospy.Subscriber('observations_topic', Float64MultiArray, self.observations_callback)
+        rospy.Subscriber('error_states', Float64MultiArray, self.states_callback)
+        rospy.Subscriber('observations_topic', Float64MultiArray, self.errors_callback)
 
         # Publisher for predictions
         self.prediction_pub = rospy.Publisher('gp_predictions', Float64MultiArray, queue_size=10)
+        self.correction_pub = rospy.Publisher('gp_corrections', Float64MultiArray, queue_size=10)
 
         # Initialize GP model (you may need to adjust the kernel and other parameters)
         self.kernel = gpflow.kernels.RBF()
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(1), self.fit_gp)
+        rospy.Timer(rospy.Duration(0.1), self.fit_gp)
+
+    def get_correction(mean1, mean2, mean3, var1, var2, var3, error):
+        
+        rho1 = max(abs(mean1 - 2.5*var1), abs(mean1 + 2.5*var1))
+        rho2 = max(abs(mean2 - 2.5*var2), abs(mean2 + 2.5*var2))
+        rho3 = max(abs(mean3 - 2.5*var3), abs(mean3 + 2.5*var3))
+
+        rho = rho1 * rho1 + rho2 * rho2 + rho3 * rho3
+        rho = rho**0.5
+
+        B = np.zeros([6, 3])
+        B[3:5, 0:2] = np.identity(3)
+
+        print(B)
+        K_P = np.array([[26.5948*9, 0, 0], 
+                        [0, 26.5948*9, 0], 
+                        [0, 0, 26.5948*9]])
+        
+        K_D = np.array([[23.0629*3, 0, 0], 
+                        [0, 23.0629*3, 0], 
+                        [0, 0, 23.0629*3]])
+        
+
+        A = np.zeros([6, 6])
+        A[3:5, 0:2] = -K_P
+        A[3:5, 3:5] = -K_D
+        A[0:2, 3:5] = np.identity(3)
+        epsilon = 0.001
+        Q = np.identity(6)
+
+        P = solve_continuous_are(a = A, b = np.zeros([6, 6]), r = np.identity(6))
+
+        w =  B.T * P * error
+        if np.linalg.norm(w)>epsilon:
+            r = -rho * w/np.linalg.norm(w)
+        else:
+            r = -rho * w/epsilon
+
+        return r
 
     def states_callback(self, msg):
         if len(self.states_buffer)>=self.buffer_size:
@@ -51,9 +94,17 @@ class GPFittingNode:
             mean3, var3 = self.gp_model3.predict_f(data)
 
             # print("\npredicted data is: ", mean1.numpy()[0][0])
+            # Calculation of robust corrections
+
+            error = self.error_buffer[len(self.error_buffer)-1]
+            print("Error is: ", error)
+
+            correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
+            correction_val = Float64MultiArray(data = [correction[0], correction[1], correction[2]])
 
             prediction = Float64MultiArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
-
+            
+            self.correction_pub.publish(correction_val)
             self.prediction_pub.publish(prediction)
 
     def observations_callback(self, msg):
@@ -70,6 +121,16 @@ class GPFittingNode:
         self.observation1_buffer.append(msg.data[0])
         self.observation2_buffer.append(msg.data[1])
         self.observation3_buffer.append(msg.data[2])
+
+
+    def errors_callback(self, msg):
+
+        if len(self.error_buffer) >= self.buffer_size:
+            self.error_buffer.append(msg.data)
+            self.error_buffer.pop(0)
+            return 
+        
+        self.error_buffer.append(msg.data)
 
 
 

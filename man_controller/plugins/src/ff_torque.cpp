@@ -81,13 +81,13 @@ InvDynController::InvDynController(){
     
 
 
-    KP << 26.5948*5, 0, 0,
-          0, 26.59488*5, 0,
-          0, 0, 26.5948*5;
+    KP << 26.5948*5*9, 0, 0,
+          0, 26.59488*5*9, 0,
+          0, 0, 26.5948*5*9;
 
-    KD << 23.0629, 0, 0,
-          0, 23.0629, 0,
-          0, 0, 23.0629;
+    KD << 23.0629*3, 0, 0,
+          0, 23.0629*3, 0,
+          0, 0, 23.0629*3;
 
     ff_torque = Eigen::Vector3f::Zero();
     fb_torque = Eigen::Vector3f::Zero();
@@ -152,7 +152,7 @@ Eigen::Vector3f InvDynController::get_ff(Eigen::Vector3f correction){
     //                     -1.0*I_2(0, 0)*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) + 1.0*I_2(1, 1)*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) - 1.0*I_3(0, 0)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) + 1.0*I_3(1, 1)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) - 0.25*L2*L2*m2*sin(joint_pos(1))*cos(joint_pos(1))*joint_vel(0)*joint_vel(0) - 0.125*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*(4*L2*cos(joint_pos(1)) + 2*L3*cos(joint_pos(1) + joint_pos(2)))*joint_vel(0)*joint_vel(0) + (2.0*L2*L2*m3*sin(joint_pos(2))*cos(joint_pos(2))*joint_vel(1) - 0.5*L2*m3*(2*L2*cos(joint_pos(2)) + L3)*sin(joint_pos(2))*joint_vel(1) - 1.0*L2*m3*(L2*cos(joint_pos(2))*joint_vel(1) + L3*(joint_vel(1) + joint_vel(2))/2)*sin(joint_pos(2)))*joint_vel(2), 
     //                     -1.0*I_3(0, 0)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) + 1.0*I_3(1, 1)*sin(joint_pos(1) + joint_pos(2))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0) - 1.0*L2*L2*m3*sin(joint_pos(2))*cos(joint_pos(2))*joint_vel(1)*joint_vel(1) - 0.5*L2*L3*m3*sin(joint_pos(2))*joint_vel(1)*joint_vel(2) + 1.0*L2*m3*(L2*cos(joint_pos(2))*joint_vel(1) + L3*(joint_vel(1) + joint_vel(2))/2)*sin(joint_pos(2))*joint_vel(1) - 0.25*L3*m3*(2*L2*sin(joint_pos(1)) + L3*sin(joint_pos(1) + joint_pos(2)))*cos(joint_pos(1) + joint_pos(2))*joint_vel(0)*joint_vel(0);
 
-    Eigen::Vector3f ff = M * (joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel) - correction) + G + H;
+    Eigen::Vector3f ff = M * (joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel) + correction) + G + H;
 
     // std::cout<<std::endl<<"This is G matrix: "<<G.transpose()<<std::endl;
     // std::cout<<std::endl<<"This is H matrix: "<<H.transpose()<<std::endl;

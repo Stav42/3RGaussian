@@ -56,6 +56,8 @@ namespace gazebo
       Eigen::VectorXf errors;
       Eigen::VectorXf gp_mean;
 
+      Eigen::VectorXf corr;
+
       // std::vector<float> gp_mean(3);
       // std::vector<float> gp_stddev(3);
 
@@ -90,12 +92,15 @@ namespace gazebo
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->gp_pred = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::predCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_corr = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_corrections", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
 
 
+      this->error_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/error_states", 1);
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
       this->gp_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/states_topic", 1);
+      
 
       this->gp_observations_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/observations_topic", 1);
 
@@ -199,6 +204,19 @@ namespace gazebo
         gp_state.data.push_back(state(i));
       }
 
+      Eigen::VectorXf error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
+      Eigen::VectorXf error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_pos_vel;
+      
+
+      std_msgs::Float64MultiArray error_state;
+      for(int i=0; i<6;i++){
+        if i<3:
+          error_state.data.push_back(error_state_gp(i));
+        else:
+          error_state.data.push_back(error_dot_state_gp(i-3));
+      }
+
+      error_state_publisher.publish(error_state)
       gp_state_publisher.publish(gp_state);
 
       if(count%10 == 0 && count>0){
@@ -251,22 +269,22 @@ namespace gazebo
         
       }
       std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
-      std::cout<<"Torque correction is: "<<this->InvDyn.M * gp_mean<<std::endl;
+      std::cout<<"Torque correction is: "<<-1 * this->InvDyn.M * gp_mean<<std::endl;
       mean = Eigen::Vector3f::Zero();
       mean = gp_mean;
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
-      this->torque = this->InvDyn.get_total_torque(mean);
+      this->torque = this->InvDyn.get_total_torque(corr);
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
-      Eigen::Vector3f com_pos;
+      // Eigen::Vector3f com_pos;
       
-      com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
+      // com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
 
       // std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
 
-      ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
+      // ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
 
       // std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
       man_controller::FloatValue err = man_controller::FloatValue();
@@ -304,6 +322,16 @@ namespace gazebo
       gp_mean(0) = mean1;
       gp_mean(1) = mean2;
       gp_mean(2) = mean3;
+    }
+
+    public: void corrCallback(const std_msgs::Float64MultiArray::ConstPtr &msg){
+      float corr1 = msg->data[0];
+      float corr2 = msg->data[1];
+      float corr3 = msg->data[2];
+      
+      corr(0) = corr1;
+      corr(1) = corr2;
+      corr(2) = corr3;
     }
 
     public: void posCallback(const man_controller::Traj::ConstPtr& msg){

@@ -66,7 +66,7 @@ endif()
 
 
 
-set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros/lib/clang/14.0.6/include;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include")
+set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros/include;/Users/stav.42/miniconda3/envs/ros/lib/clang/14.0.6/include;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include")
 set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
-set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros_env/lib;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib")
+set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "/Users/stav.42/miniconda3/envs/ros/lib;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib")
 set(CMAKE_C_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks")
