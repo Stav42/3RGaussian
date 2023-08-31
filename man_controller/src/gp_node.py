@@ -39,7 +39,7 @@ class GPFittingNode:
         self.kernel = gpflow.kernels.RBF()
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(0.1), self.fit_gp)
+        rospy.Timer(rospy.Duration(0.5), self.fit_gp)
 
     def get_correction(self, mean1, mean2, mean3, var1, var2, var3, error):
 

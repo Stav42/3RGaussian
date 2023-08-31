@@ -120,43 +120,21 @@ Eigen::Vector3f InvDynController::get_ff(Eigen::Vector3f correction){
     H << (joint_vel(0)*(8*m3*joint_vel(1)*sin(2*joint_pos(1) + joint_pos(2)) - 4*m3*joint_vel(2)*sin(joint_pos(2)) + 4*m3*joint_vel(2)*sin(2*joint_pos(1) + joint_pos(2)) + 25*I_2(0, 0)*joint_vel(1)*sin(2*joint_pos(1)) - 25*I_2(2, 2)*joint_vel(1)*sin(2*joint_pos(1)) + 4*m2*joint_vel(1)*sin(2*joint_pos(1)) + 4*m3*joint_vel(1)*sin(2*joint_pos(1)) + 25*I_3(0, 0)*joint_vel(1)*sin(2*joint_pos(1) + 2*joint_pos(2)) + 25*I_3(0, 0)*joint_vel(2)*sin(2*joint_pos(1) + 2*joint_pos(2)) - 25*I_3(2, 2)*joint_vel(1)*sin(2*joint_pos(1) + 2*joint_pos(2)) - 25*I_3(2, 2)*joint_vel(2)*sin(2*joint_pos(1) + 2*joint_pos(2)) + 4*m3*joint_vel(1)*sin(2*joint_pos(1) + 2*joint_pos(2)) + 4*m3*joint_vel(2)*sin(2*joint_pos(1) + 2*joint_pos(2))))/25, (I_2(2, 2)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1)))/2 - (4*m3*joint_vel(2)*joint_vel(2)*sin(joint_pos(2)))/25 - (4*m3*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + joint_pos(2)))/25 - (I_2(0, 0)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1)))/2 - (2*m3*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/25 - (2*m2*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1)))/25 - (2*m3*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1)))/25 - (I_3(0, 0)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/2 + (I_3(2, 2)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/2 - (8*m3*joint_vel(1)*joint_vel(2)*sin(joint_pos(2)))/25, (2*m3*joint_vel(0)*joint_vel(0)*sin(joint_pos(2)))/25 - (2*m3*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/25 + (4*m3*joint_vel(1)*joint_vel(1)*sin(joint_pos(2)))/25 - (2*m3*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + joint_pos(2)))/25 - (I_3(0, 0)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/2 + (I_3(2, 2)*joint_vel(0)*joint_vel(0)*sin(2*joint_pos(1) + 2*joint_pos(2)))/2;
 
     Eigen::Vector3f ff = M * (joint_acc_ref + KP * (joint_pos_ref - joint_pos)  + KD * (joint_vel_ref - joint_vel) + correction) + G + H;
-
-
     return ff;
 
 }
 
 Eigen::Vector3f InvDynController::get_fb_torque(){
     
-    // fb_torque = Eigen::Vector3f::Zero();
     fb_torque = KP * (joint_pos_ref - joint_pos) + KD * (joint_vel_ref - joint_vel);
-    // std::cout<<"joint_pos_ref is: "<<joint_pos_ref<<std::endl;
-    // std::cout<<"joint_pos is: "<<joint_pos<<std::endl;
-    // joint_pos_ref[1] = 0;
-    // joint_pos_ref[0] = 0;
-    // fb_torque = KP * (joint_pos_ref - joint_pos);
-    // std::cout<<"fb_torque is: "<<fb_torque<<std::endl;
-    
     return fb_torque;
 
 };
 Eigen::Vector3f InvDynController::get_total_torque(Eigen::Vector3f correction){
     
-    // if(!joint_pos_ref.isZero(0.001) && !joint_vel_ref.isZero(0.001) && !joint_acc_ref.isZero(0.001)){
-            // torque = get_ff_torque() + get_fb_torque();
     Eigen::Vector3f ff = get_ff_upd(correction);
     Eigen::Vector3f fb = get_fb_torque();
-    // std::cout<<"Feedforward Torque from M"<<std::endl<<ff;
     return ff;
-    // return get_ff_torque() + get_fb_torque();
-    // return get_fb_torque();
-    // }
-    // else{
-        // 
-        // std::cout<<"Some values not initialized yet"<<std::endl;
-        // return Eigen::Vector3f::Zero();
-    // }
-
 
 };
 

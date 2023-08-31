@@ -180,22 +180,6 @@ namespace gazebo
       this->joint_vel_publisher.publish(this->joint_vel);    
 
       this->joint_acc_publisher.publish(acc);
-      // joint1->SetForce(0, torque[0]);
-      // joint2->SetForce(0, torque[1]);
-      // joint3->SetForce(0, torque[2]);
-
-      // Sampling and fitting at 0.1 Hz
-
-
-      // std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
-      // this->torque = this->InvDyn.get_total_torque();
-      // std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
-      // // std::cout<<"Torque applied"<<this->torque<<std::endl;
-      // joint1->SetForce(0, torque[0]);
-      // joint2->SetForce(0, torque[1]);
-      // joint3->SetForce(0, torque[2]);
-      
-      // std::cout<<"Checkpoint 1"<<std::endl;
       state(0) = this-> InvDyn.joint_pos(0);
       state(1) = this-> InvDyn.joint_pos(1);
       state(2) = this-> InvDyn.joint_pos(2);
@@ -290,7 +274,7 @@ namespace gazebo
       std::cout << "Prediction ROS Time:  "<<this->savedTimestamp.toSec() << " seconds "<<std::endl;
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
-      corr = Eigen::Vector3f::Zero()
+      corr = Eigen::Vector3f::Zero();
 
       this->torque = this->InvDyn.get_total_torque(corr);
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
