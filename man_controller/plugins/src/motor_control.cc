@@ -274,7 +274,7 @@ namespace gazebo
       std::cout << "Prediction ROS Time:  "<<this->savedTimestamp.toSec() << " seconds "<<std::endl;
 
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
-      corr = Eigen::Vector3f::Zero();
+      // corr = Eigen::Vector3f::Zero();
 
       this->torque = this->InvDyn.get_total_torque(corr);
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
