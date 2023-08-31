@@ -6,7 +6,10 @@
 #include <man_controller/FloatValue.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <man_controller/FloatArray.h>
 #include <boost/bind.hpp>
+#include <gazebo/common/Time.hh>
+#include <gazebo/physics/physics.hh>
 #include "ff_torque.h"
 #include "gp.h"
 
@@ -31,7 +34,7 @@ namespace gazebo
       ros::Subscriber ref_acc_sub;
       ros::Subscriber gp_pred;
       ros::Subscriber gp_corr;
-
+      ros::Time savedTimestamp;
 
       ros::Publisher joint_pos_publisher;
       ros::Publisher joint_vel_publisher;
@@ -94,8 +97,8 @@ namespace gazebo
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_pred = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::predCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_corr = this->rosNode->subscribe<std_msgs::Float64MultiArray>("/gp_corrections", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred = this->rosNode->subscribe<man_controller::FloatArray>("/gp_predictions", 1, boost::bind(&ManipulatorPlugin::predCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_corr = this->rosNode->subscribe<man_controller::FloatArray>("/gp_corrections", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
 
 
       this->error_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/error_states", 1);
@@ -278,20 +281,21 @@ namespace gazebo
       mean = Eigen::Vector3f::Zero();
       mean = gp_mean;
 
+      gazebo::common::Time currentGzTime = this->model->GetWorld()->SimTime();
+      std::cout << "Gazebo Simulation Time: " << currentGzTime.Double() << " seconds" << std::endl;
+
+      ros::Time currentROSTime = ros::Time::now();
+      std::cout << "ROS Time: " << currentROSTime.toSec() << " seconds" << std::endl;
+
+      std::cout << "Prediction ROS Time:  "<<this->savedTimestamp.toSec() << " seconds "<<std::endl;
+
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
+      corr = Eigen::Vector3f::Zero()
+
       this->torque = this->InvDyn.get_total_torque(corr);
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
-      // Eigen::Vector3f com_pos;
-      
-      // com_pos << (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*cos(this->InvDyn.joint_pos(0))/2, (2*this->InvDyn.L2*sin(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*sin(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2)))*sin(this->InvDyn.joint_pos(0))/2, this->InvDyn.L1 + this->InvDyn.L2*cos(this->InvDyn.joint_pos(1)) + this->InvDyn.L3*cos(this->InvDyn.joint_pos(1) + this->InvDyn.joint_pos(2))/2;
-
-      // std::cout<<"Pose according to COG of link3 is: "<<com_pos.transpose()<<std::endl;
-
-      // ignition::math::Pose3d com = link3->WorldCoGPose(); // Center of Mass
-
-      // std::cout<<"Pose according to COG of link3 according to Gazebo API is: "<<com<<std::endl;
       man_controller::FloatValue err = man_controller::FloatValue();
 
       Eigen::VectorXf error;
@@ -300,8 +304,6 @@ namespace gazebo
       accumulated_error += err_norm;
       count_rms += 1;
 
-      // std::cout<<"RMS error: "<<sqrt(accumulated_error/count_rms)<<std::endl;
-      // std::cout<<"count: "<<count_rms<<std::endl;
 
       err.value = err_norm;
 
@@ -319,21 +321,25 @@ namespace gazebo
       ros::spinOnce();
     }
 
-    public: void predCallback(const std_msgs::Float64MultiArray::ConstPtr &msg){
+    public: void predCallback(const man_controller::FloatArray::ConstPtr &msg){
       float mean1 = msg->data[0];
       float mean2 = msg->data[1];
       float mean3 = msg->data[2];
       
+      // this->savedTimestamp = msg->header.stamp;
+
       gp_mean(0) = mean1;
       gp_mean(1) = mean2;
       gp_mean(2) = mean3;
     }
 
-    public: void corrCallback(const std_msgs::Float64MultiArray::ConstPtr &msg){
+    public: void corrCallback(const man_controller::FloatArray::ConstPtr &msg){
       float corr1 = msg->data[0];
       float corr2 = msg->data[1];
       float corr3 = msg->data[2];
       
+      this->savedTimestamp = msg->header.stamp;
+
       corr(0) = corr1;
       corr(1) = corr2;
       corr(2) = corr3;

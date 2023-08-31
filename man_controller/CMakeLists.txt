@@ -21,6 +21,7 @@ add_message_files(
   FILES
   Traj.msg
   FloatValue.msg
+  FloatArray.msg
 )
 
 generate_messages(

@@ -7497,6 +7497,8 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_co
   /Users/stav.42/miniconda3/envs/ros/include/std_msgs/Float64MultiArray.h \
   /Users/stav.42/miniconda3/envs/ros/include/std_msgs/MultiArrayLayout.h \
   /Users/stav.42/miniconda3/envs/ros/include/std_msgs/MultiArrayDimension.h \
+  /Users/stav.42/ws/devel/.private/man_controller/include/man_controller/FloatArray.h \
+  /Users/stav.42/miniconda3/envs/ros/include/std_msgs/Header.h \
   /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.h \
   /Users/stav.42/miniconda3/envs/ros/include/eigen3/Eigen/Dense \
   /Users/stav.42/miniconda3/envs/ros/include/eigen3/Eigen/Core \
@@ -7691,6 +7693,8 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_co
   /Users/stav.42/miniconda3/envs/ros/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   /Users/stav.42/ws/src/man_controller/plugins/src/gp.h
 
+
+/Users/stav.42/ws/devel/.private/man_controller/include/man_controller/FloatArray.h:
 
 /Users/stav.42/miniconda3/envs/ros/include/std_msgs/MultiArrayDimension.h:
 
@@ -14607,6 +14611,8 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_co
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_uintmax_t.h:
 
 /Users/stav.42/miniconda3/envs/ros/include/c++/v1/__memory/allocator.h:
+
+/Users/stav.42/miniconda3/envs/ros/include/std_msgs/Header.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_time_t.h:
 

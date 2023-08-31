@@ -4,6 +4,7 @@ import rospy
 import gpflow
 import numpy as np
 from std_msgs.msg import Float64MultiArray
+from man_controller.msg import FloatArray
 from scipy.linalg import solve_continuous_are
 
 class GPFittingNode:
@@ -31,8 +32,8 @@ class GPFittingNode:
         rospy.Subscriber('observations_topic', Float64MultiArray, self.observations_callback)
 
         # Publisher for predictions
-        self.prediction_pub = rospy.Publisher('gp_predictions', Float64MultiArray, queue_size=10)
-        self.correction_pub = rospy.Publisher('gp_corrections', Float64MultiArray, queue_size=10)
+        self.prediction_pub = rospy.Publisher('gp_predictions', FloatArray, queue_size=10)
+        self.correction_pub = rospy.Publisher('gp_corrections', FloatArray, queue_size=10)
 
         # Initialize GP model (you may need to adjust the kernel and other parameters)
         self.kernel = gpflow.kernels.RBF()
@@ -109,9 +110,13 @@ class GPFittingNode:
             correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
             print(correction.numpy())
             correction = correction.numpy()
-            correction_val = Float64MultiArray(data = [correction[0][0], correction[0][1], correction[0][2]])
+            correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
+            correction_val.header.stamp = rospy.Time.now()
+            correction_val.header.frame_id = 'GP Correction'
 
-            prediction = Float64MultiArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
+            prediction = FloatArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
+            prediction.header.stamp = rospy.Time.now()
+            prediction.header.frame_id = 'GP Prediction'
             
             self.correction_pub.publish(correction_val)
             self.prediction_pub.publish(prediction)
@@ -148,7 +153,7 @@ class GPFittingNode:
 
     def fit_gp(self, event):
 
-        # print("Calling fitting function")
+        print("Calling fitting function")
         if len(self.states_buffer) == self.buffer_size and len(self.observation1_buffer) > 0 and len(self.observation2_buffer) > 0 and len(self.observation3_buffer) > 0:
             # X = np.array(self.states_buffer).reshape(-1, 1)
             X = np.array(self.states_buffer)
