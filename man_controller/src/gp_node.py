@@ -69,7 +69,7 @@ class GPFittingNode:
         A[3:6, 0:3] = -K_P
         A[3:6, 3:6] = -K_D
         A[0:3, 3:6] = np.identity(3)
-        epsilon = 0.001
+        epsilon = 0.01
         Q = np.identity(6)
 
         P = solve_continuous_are(a = A, b = np.zeros([6, 6]), r = np.identity(6), q = Q)
@@ -79,6 +79,8 @@ class GPFittingNode:
             r = -rho * w/np.linalg.norm(w)
         else:
             r = -rho * w/epsilon
+
+        print("r is: \n", r)
 
         return r
 
@@ -94,7 +96,8 @@ class GPFittingNode:
 
         if self.gp_model1 and self.gp_model2 and self.gp_model3:
             data = np.expand_dims(np.array(msg.data), axis=0)
-             
+
+            print("Data is: ", data)             
             # print(data.shape)
 
             mean1, var1 = self.gp_model1.predict_f(data)
@@ -105,10 +108,12 @@ class GPFittingNode:
             # Calculation of robust corrections
 
             error = self.error_buffer[len(self.error_buffer)-1]
-            print("Error is: ", error)
+            print("\nError is: ", error)
+
+            print("\nPrediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy(), var1.numpy(), var2.numpy(), var3.numpy())
 
             correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
-            print(correction.numpy())
+
             correction = correction.numpy()
             correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
             correction_val.header.stamp = rospy.Time.now()

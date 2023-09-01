@@ -261,7 +261,7 @@ namespace gazebo
         
       }
       std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
-      std::cout<<"Torque correction is: "<<-1 * this->InvDyn.M * gp_mean<<std::endl;
+      // std::cout<<"Torque correction is: "<<-1 * this->InvDyn.M * gp_mean<<std::endl;
       mean = Eigen::Vector3f::Zero();
       mean = gp_mean;
 
@@ -276,7 +276,20 @@ namespace gazebo
       std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       // corr = Eigen::Vector3f::Zero();
 
+      bool hasNan = false;
+      
+      for (int i = 0; i < corr.size(); ++i) {
+        if (std::isnan(corr[i])) {
+            hasNan = true;
+            break; // Exit the loop if a NaN is found
+        }
+      }
+
+      if(hasNan)
+      corr = Eigen::Vector3f::Zero();
+
       this->torque = this->InvDyn.get_total_torque(corr);
+      std::cout<<"Corr is: "<<corr.transpose()<<std::endl;
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
