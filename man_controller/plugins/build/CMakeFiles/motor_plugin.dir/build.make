@@ -69,19 +69,19 @@ include CMakeFiles/motor_plugin.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/motor_plugin.dir/flags.make
 
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: CMakeFiles/motor_plugin.dir/flags.make
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: CMakeFiles/motor_plugin.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/motor_plugin.dir/src/motor_control.cc.o"
-	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/motor_plugin.dir/src/motor_control.cc.o -MF CMakeFiles/motor_plugin.dir/src/motor_control.cc.o.d -o CMakeFiles/motor_plugin.dir/src/motor_control.cc.o -c /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o: CMakeFiles/motor_plugin.dir/flags.make
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o: /Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o: CMakeFiles/motor_plugin.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/stav.42/ws/src/man_controller/plugins/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o"
+	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o -MF CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o.d -o CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o -c /Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc
 
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_plugin.dir/src/motor_control.cc.i"
-	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc > CMakeFiles/motor_plugin.dir/src/motor_control.cc.i
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.i"
+	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc > CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.i
 
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_plugin.dir/src/motor_control.cc.s"
-	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc -o CMakeFiles/motor_plugin.dir/src/motor_control.cc.s
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.s"
+	/Users/stav.42/miniconda3/envs/ros/bin/arm64-apple-darwin20.0.0-clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc -o CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.s
 
 CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o: CMakeFiles/motor_plugin.dir/flags.make
 CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o: /Users/stav.42/ws/src/man_controller/plugins/src/ff_torque.cpp
@@ -113,14 +113,14 @@ CMakeFiles/motor_plugin.dir/src/gp.cpp.s: cmake_force
 
 # Object files for target motor_plugin
 motor_plugin_OBJECTS = \
-"CMakeFiles/motor_plugin.dir/src/motor_control.cc.o" \
+"CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o" \
 "CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o" \
 "CMakeFiles/motor_plugin.dir/src/gp.cpp.o"
 
 # External object files for target motor_plugin
 motor_plugin_EXTERNAL_OBJECTS =
 
-libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/motor_control.cc.o
+libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/ff_torque.cpp.o
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/src/gp.cpp.o
 libmotor_plugin.dylib: CMakeFiles/motor_plugin.dir/build.make

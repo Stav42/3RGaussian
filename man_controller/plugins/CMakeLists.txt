@@ -30,7 +30,7 @@ set(INCLUDE_DIR "include")
 link_directories(${GAZEBO_LIBRARY_DIRS}) # /usr/local/MATLAB/R2021a/bin/glnxa64)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-add_library(motor_plugin SHARED src/motor_control.cc src/ff_torque.cpp src/gp.cpp)
+add_library(motor_plugin SHARED src/motor_control_dist.cc src/ff_torque.cpp src/gp.cpp)
 # target_link_libraries(motor_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES} Eigen3::Eigen)
 target_link_libraries(motor_plugin
 ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES} Eigen3::Eigen ${catkin_LIBRARIES}

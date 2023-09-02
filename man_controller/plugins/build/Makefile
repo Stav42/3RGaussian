@@ -557,29 +557,29 @@ src/gp.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/gp.cpp.s
 .PHONY : src/gp.cpp.s
 
-src/motor_control.o: src/motor_control.cc.o
-.PHONY : src/motor_control.o
+src/motor_control_dist.o: src/motor_control_dist.cc.o
+.PHONY : src/motor_control_dist.o
 
 # target to build an object file
-src/motor_control.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control.cc.o
-.PHONY : src/motor_control.cc.o
+src/motor_control_dist.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o
+.PHONY : src/motor_control_dist.cc.o
 
-src/motor_control.i: src/motor_control.cc.i
-.PHONY : src/motor_control.i
+src/motor_control_dist.i: src/motor_control_dist.cc.i
+.PHONY : src/motor_control_dist.i
 
 # target to preprocess a source file
-src/motor_control.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control.cc.i
-.PHONY : src/motor_control.cc.i
+src/motor_control_dist.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.i
+.PHONY : src/motor_control_dist.cc.i
 
-src/motor_control.s: src/motor_control.cc.s
-.PHONY : src/motor_control.s
+src/motor_control_dist.s: src/motor_control_dist.cc.s
+.PHONY : src/motor_control_dist.s
 
 # target to generate assembly for a file
-src/motor_control.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control.cc.s
-.PHONY : src/motor_control.cc.s
+src/motor_control_dist.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/motor_plugin.dir/build.make CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.s
+.PHONY : src/motor_control_dist.cc.s
 
 # Help Target
 help:
@@ -626,9 +626,9 @@ help:
 	@echo "... src/gp.o"
 	@echo "... src/gp.i"
 	@echo "... src/gp.s"
-	@echo "... src/motor_control.o"
-	@echo "... src/motor_control.i"
-	@echo "... src/motor_control.s"
+	@echo "... src/motor_control_dist.o"
+	@echo "... src/motor_control_dist.i"
+	@echo "... src/motor_control_dist.s"
 .PHONY : help
 
 

@@ -4029,7 +4029,7 @@ CMakeFiles/motor_plugin.dir/src/gp.cpp.o: /Users/stav.42/ws/src/man_controller/p
   /Users/stav.42/ws/devel/.private/man_controller/include/man_controller/Traj.h \
   /Users/stav.42/ws/src/man_controller/plugins/src/gp.h
 
-CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc \
+CMakeFiles/motor_plugin.dir/src/motor_control_dist.cc.o: /Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc \
   /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/gazebo.hh \
   /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/gazebo_core.hh \
   /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/common/common.hh \
@@ -9330,6 +9330,8 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_co
 
 /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/msgs/image_stamped.pb.h:
 
+/Users/stav.42/ws/src/man_controller/plugins/src/motor_control_dist.cc:
+
 /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/common/URI.hh:
 
 /Users/stav.42/miniconda3/envs/ros/include/gazebo-11/gazebo/common/AudioDecoder.hh:
@@ -13557,8 +13559,6 @@ CMakeFiles/motor_plugin.dir/src/motor_control.cc.o: /Users/stav.42/ws/src/man_co
 /Users/stav.42/miniconda3/envs/ros/include/ignition/msgs5/ignition/msgs/joint_trajectory.pb.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stdio.h:
-
-/Users/stav.42/ws/src/man_controller/plugins/src/motor_control.cc:
 
 /Users/stav.42/miniconda3/envs/ros/include/c++/v1/__algorithm/partition_copy.h:
 
