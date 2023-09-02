@@ -3,16 +3,18 @@
 import rospy
 import gpflow
 import numpy as np
+import time as pkg_time
 from std_msgs.msg import Float64MultiArray
 from man_controller.msg import FloatArray
 from gpflow.utilities import print_summary
 from scipy.linalg import solve_continuous_are
+import tensorflow as tf
 
 class GPFittingNode:
     def __init__(self):
 
         self.buffer_size = 50
-        self.tuning_buffer_size = 1000
+        self.tuning_buffer_size = 500
         self.skip = 0
         self.skip_obs = 0
         # Buffers for states and observations
@@ -34,6 +36,10 @@ class GPFittingNode:
         self.gp_model1 = None
         self.gp_model2 = None
         self.gp_model3 = None
+
+        self.posterior1 = None
+        self.posterior2 = None
+        self.posterior3 = None
 
         self.tuned = False
 
@@ -106,7 +112,6 @@ class GPFittingNode:
     def training_callback(self, msg):
 
         # print("Training callback, size: ", len(msg.data))
-        self.skip = 0
         if len(self.tuning_state_buffer)<self.tuning_buffer_size:
             if self.skip%20 == 0:
                 # print("Tuning happening for: ", msg.data[0])
@@ -143,51 +148,60 @@ class GPFittingNode:
         #     self.states_buffer.pop(0)
         # else:
         #     self.states_buffer.append(msg.data)
+        with tf.device("/cpu:0"):
 
+            if self.posterior1 and self.posterior2 and self.posterior3 and self.tuned:
+                data = np.expand_dims(np.array(msg.data), axis=0)
+ 
 
-        if self.gp_model1 and self.gp_model2 and self.gp_model3 and self.tuned:
-            data = np.expand_dims(np.array(msg.data), axis=0)
+                print("Data is: ", data.shape)             
+                # print(data.shape)
+                time = msg.header.stamp
+                # print("\nStates being used to get prediction for observation: ", data)
+                # start_time = pkg_time.time()
 
+                # mean1, var1 = self.gp_model1.predict_f(data)
+                # mean2, var2 = self.gp_model2.predict_f(data)
+                # mean3, var3 = self.gp_model3.predict_f(data)
 
-            print("Data is: ", data.shape)             
-            # print(data.shape)
-            time = msg.header.stamp
-            # print("\nStates being used to get prediction for observation: ", data)
+                # print("Time taken to predict: ", start_time - pkg_time.time())
+                start_time = pkg_time.time()
+                mean11, var11 = self.posterior1.predict_f(data)
+                mean21, var21 = self.posterior2.predict_f(data)
+                mean31, var31 = self.posterior3.predict_f(data)
 
-            mean1, var1 = self.gp_model1.predict_f(data)
-            mean2, var2 = self.gp_model2.predict_f(data)
-            mean3, var3 = self.gp_model3.predict_f(data)
+                print("Time taken to predict using posterior: ", pkg_time.time()-start_time)
 
-            print("Time of publishing of this data is: ", time)
-            print("@@@@@@@@@@@@@@@@@@@@@@\n\n\n\n\n Prediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy(), "\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
+                print("Time of publishing of this data is: ", time)
+                # print("@@@@@@@@@@@@@@@@@@@@@@\n\n\n\n\n Prediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy(), "\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
+                print("Posterior calculation is: ",  mean11.numpy(), mean21.numpy(), mean31.numpy())
 
+                # print("\npredicted data is: ", mean1.numpy()[0][0])
+                # Calculation of robust corrections
 
-            # print("\npredicted data is: ", mean1.numpy()[0][0])
-            # Calculation of robust corrections
+                # error = self.error_buffer[len(self.error_buffer)-1]
+                # print("\nError is: ", error)
 
-            # error = self.error_buffer[len(self.error_buffer)-1]
-            # print("\nError is: ", error)
+                # print("\nPrediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy())
+                # print("\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
 
-            # print("\nPrediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy())
-            # print("\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
+                # correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
 
-            # correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
+                # correction = correction.numpy()
+                # correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
+                # correction_val.header.stamp = rospy.Time.now()
+                # correction_val.header.frame_id = 'GP Correction'¡
 
-            # correction = correction.numpy()
-            # correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
-            # correction_val.header.stamp = rospy.Time.now()
-            # correction_val.header.frame_id = 'GP Correction'¡
+                correction_val = FloatArray(data = [0, 0, 0])
+                correction_val.header.stamp = rospy.Time.now()
+                correction_val.header.frame_id = 'GP Correction'
 
-            correction_val = FloatArray(data = [0, 0, 0])
-            correction_val.header.stamp = rospy.Time.now()
-            correction_val.header.frame_id = 'GP Correction'
-
-            prediction = FloatArray(data=[mean1.numpy()[0][0], mean2.numpy()[0][0], mean3.numpy()[0][0]])
-            prediction.header.stamp = rospy.Time.now()
-            prediction.header.frame_id = 'GP Prediction'
-            
-            self.correction_pub.publish(correction_val)
-            self.prediction_pub.publish(prediction)
+                prediction = FloatArray(data=[mean11.numpy()[0][0], mean21.numpy()[0][0], mean31.numpy()[0][0]])
+                prediction.header.stamp = rospy.Time.now()
+                prediction.header.frame_id = 'GP Prediction'
+                
+                self.correction_pub.publish(correction_val)
+                self.prediction_pub.publish(prediction)
 
     def observations_callback(self, msg):
 
@@ -237,56 +251,74 @@ class GPFittingNode:
         # print("Time stamp of latest state for GP1 input: \n", self.tuning_state_time_buffer[len(self.tuning_state_time_buffer)-1])
         
         print(len(self.tuning_obs1_buffer), len(self.tuning_state_buffer), self.tuned)
-        if len(self.tuning_obs1_buffer) == self.tuning_buffer_size and len(self.tuning_state_buffer) == self.tuning_buffer_size and not self.tuned:
-            # X = np.array(self.states_buffer).reshape(-1, 1)
-            X = np.array(self.tuning_state_buffer)
-            Y1 = np.array(self.tuning_obs1_buffer).reshape(-1, 1)
-            Y2 = np.array(self.tuning_obs2_buffer).reshape(-1, 1)
-            Y3 = np.array(self.tuning_obs3_buffer).reshape(-1, 1)
+        with tf.device("/gpu:0"):
 
-            # print(Y1)
-            # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
-            print("Length Scales before optimization:\n")
+            if len(self.tuning_obs1_buffer) == self.tuning_buffer_size and len(self.tuning_state_buffer) == self.tuning_buffer_size and not self.tuned:
+                # X = np.array(self.states_buffer).reshape(-1, 1)
+                X = np.array(self.tuning_state_buffer)
+                Y1 = np.array(self.tuning_obs1_buffer).reshape(-1, 1)
+                Y2 = np.array(self.tuning_obs2_buffer).reshape(-1, 1)
+                Y3 = np.array(self.tuning_obs3_buffer).reshape(-1, 1)
 
-            self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
-            self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel2)
-            self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel3)
+                # print(Y1)
+                # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+                print("Length Scales before optimization:\n")
 
-            print_summary(self.gp_model1)
-            print_summary(self.kernel1)
+                self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
+                self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel2)
+                self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel3)
 
-            opt1 = gpflow.optimizers.Scipy()
-            opt2 = gpflow.optimizers.Scipy()
-            opt3 = gpflow.optimizers.Scipy()
-            
-            opt1.minimize(self.gp_model1.training_loss, self.gp_model1.trainable_variables)
-            opt2.minimize(self.gp_model2.training_loss, self.gp_model2.trainable_variables)
-            opt3.minimize(self.gp_model3.training_loss, self.gp_model3.trainable_variables)
+                print_summary(self.gp_model1)
+                print_summary(self.kernel1)
 
-            self.tuned = True
+                opt1 = gpflow.optimizers.Scipy()
+                opt2 = gpflow.optimizers.Scipy()
+                opt3 = gpflow.optimizers.Scipy()
+                
+                start_time = pkg_time.time()
 
-            print("\nTrainable parameters after optimization are: \n")
-            print_summary(self.gp_model1)
-            print_summary(self.kernel1)
+                opt1.minimize(self.gp_model1.training_loss, self.gp_model1.trainable_variables)
 
-            print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD \n\n\n\n")
+                print("Time to optimize one gp model: ", start_time - pkg_time.time())
+                start_time = pkg_time.time()
+                
+                opt2.minimize(self.gp_model2.training_loss, self.gp_model2.trainable_variables)
 
-            # self.states_buffer = []
-            # self.observations_buffer = []
+                print("Time to optimize one gp model: ", start_time - pkg_time.time())
+                start_time = pkg_time.time()
 
-        # if self.tuned:
+                opt3.minimize(self.gp_model3.training_loss, self.gp_model3.trainable_variables)
+                print("Time to optimize one gp model: ", start_time - pkg_time.time())
 
-        #     X = np.array(self.states_buffer)
-        #     Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
-        #     Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
-        #     Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
 
-        #     # print(Y1)
-        #     # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+                self.tuned = True
 
-        #     self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
-        #     self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
-        #     self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel)            
+                print("\nTrainable parameters after optimization are: \n")
+                print_summary(self.gp_model1)
+                print_summary(self.kernel1)
+
+                self.posterior1 = self.gp_model1.posterior()
+                self.posterior2 = self.gp_model2.posterior()
+                self.posterior3 = self.gp_model3.posterior()
+
+                print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD \n\n\n\n")
+
+                # self.states_buffer = []
+                # self.observations_buffer = []
+
+            # if self.tuned:
+
+            #     X = np.array(self.states_buffer)
+            #     Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
+            #     Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
+            #     Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
+
+            #     # print(Y1)
+            #     # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+
+            #     self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
+            #     self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
+            #     self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel)            
 
 if __name__ == '__main__':
     try:

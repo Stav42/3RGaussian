@@ -46,6 +46,8 @@ namespace gazebo
       ros::Publisher training_data_publisher;
 
       ros::Publisher gp_observations_publisher;
+      Eigen::VectorXf error_state_gp;
+      Eigen::VectorXf error_dot_state_gp;
 
       physics::JointPtr joint1;
       physics::JointPtr joint2;
@@ -58,6 +60,14 @@ namespace gazebo
       man_controller::Traj joint_pos;
       man_controller::Traj joint_vel;
       man_controller::Traj joint_acc;
+
+      man_controller::Traj vel;
+      man_controller::Traj acc;
+      man_controller::FloatArray gp_state;
+      man_controller::FloatArray training_data;
+      man_controller::FloatArray gp_obs;
+      man_controller::FloatValue pred_er;
+      std_msgs::Float64MultiArray error_state;
       float dt;
       Eigen::VectorXf torque;
       Eigen::VectorXf state;
@@ -143,20 +153,15 @@ namespace gazebo
       // std::cout<<"Print if working"<<std::endl;
       this->joint_pos = man_controller::Traj();
 
-      float pos1 = this->joint1->Position(0);
-      float pos2 = this->joint2->Position(0);
-      float pos3 = this->joint3->Position(0);
-      // float pos4 = this->joint4->Position(0);
-
-      this->joint_pos.num1 = pos1;
-      this->joint_pos.num2 = pos2;
-      this->joint_pos.num3 = pos3;
+      this->joint_pos.num1 = this->joint1->Position(0);
+      this->joint_pos.num2 = this->joint2->Position(0);
+      this->joint_pos.num3 = this->joint3->Position(0);
       this->joint_pos.num4 = 0;
       this->joint_pos_publisher.publish(this->joint_pos);
 
-      this->InvDyn.joint_pos << pos1, pos2, pos3;
+      this->InvDyn.joint_pos << this->joint_pos.num1, this->joint_pos.num2, this->joint_pos.num3;
 
-      man_controller::Traj vel = man_controller::Traj();
+      vel = man_controller::Traj();
 
       vel.num1 = this->joint1->GetVelocity(0);
       vel.num2 = this->joint2->GetVelocity(0);
@@ -165,7 +170,7 @@ namespace gazebo
 
       this->InvDyn.joint_vel << vel.num1, vel.num2, vel.num3;
       
-      man_controller::Traj acc = man_controller::Traj();
+      acc = man_controller::Traj();
 
       acc.num1 = (vel.num1 - this->joint_vel.num1)/dt;
       acc.num2 = (vel.num2 - this->joint_vel.num2)/dt;
@@ -195,27 +200,28 @@ namespace gazebo
 
       // std::cout<<"Sim Time: "<<ros::Time::now()<<std::endl;
 
-      man_controller::FloatArray gp_state;
       gp_state.header.stamp = ros::Time::now();
       gp_state.header.frame_id = "Please be right";
+      gp_state.data.clear();
 
       for(int i=0; i<9;i++){
         gp_state.data.push_back(state(i));
       }
 
-      man_controller::FloatArray training_data;
+      
       training_data.header.stamp = ros::Time::now();
       training_data.header.frame_id = "Please be right";
+      training_data.data.clear();
 
       for(int i=0; i<9;i++){
         training_data.data.push_back(state(i));
       }  
 
-      Eigen::VectorXf error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
-      Eigen::VectorXf error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_vel_ref;
+      error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
+      error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_vel_ref;
       
 
-      std_msgs::Float64MultiArray error_state;  
+      error_state.data.clear();  
       for(int i=0; i<6;i++){
         if(i<3)
           error_state.data.push_back(error_state_gp(i));
@@ -230,7 +236,7 @@ namespace gazebo
       // std::cout<<"Actual acc is: "<<this->InvDyn.joint_acc.transpose()<<std::endl;
 
       Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
-      man_controller::FloatArray gp_obs;
+      
       gp_obs.header.stamp = ros::Time::now();
       // std::cout<<"Eta is: "<<obs.transpose()<<std::endl;
       for(int i=0; i<3;i++){
@@ -246,7 +252,7 @@ namespace gazebo
       // std::cout<<"Observation to learn is: "<<obs.transpose()<<std::endl;
       // std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
 
-      man_controller::FloatValue pred_er = man_controller::FloatValue();
+      // man_controller::FloatValue pred_er 
 
       Eigen::VectorXf pred_err = gp_mean - obs;
       pred_er.value = pred_err.norm();
@@ -255,7 +261,7 @@ namespace gazebo
       // std::cout<<"States being published are: "<<state.transpose()<<std::endl;
       // std::cout<<"Torque correction is: "<<-1 * this->InvDyn.M * gp_mean<<std::endl;
       mean = Eigen::Vector3f::Zero();
-      mean = gp_mean;
+      // mean = gp_mean;
 
       gazebo::common::Time currentGzTime = this->model->GetWorld()->SimTime();
       // std::cout << "Gazebo Simulation Time: " << currentGzTime.Double() << " seconds" << std::endl;
