@@ -14,7 +14,7 @@ class GPFittingNode:
     def __init__(self):
 
         self.buffer_size = 50
-        self.tuning_buffer_size = 500
+        self.tuning_buffer_size = 1000
         self.skip = 0
         self.skip_obs = 0
         # Buffers for states and observations
@@ -55,7 +55,7 @@ class GPFittingNode:
 
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(0.4), self.fit_gp)
+        rospy.Timer(rospy.Duration(0.1), self.fit_gp)
 
     def get_correction(self, mean1, mean2, mean3, var1, var2, var3, error):
 
@@ -265,26 +265,23 @@ class GPFittingNode:
                 # print_summary(self.gp_model1)
                 # print_summary(self.kernel1)
 
-                self.posterior1 = self.gp_model1.posterior()
+                # self.posterior1 = self.gp_model1.posterior()
 
                 print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD \n\n\n\n")
 
                 # self.states_buffer = []
                 # self.observations_buffer = []
 
-            # if self.tuned:
+            if self.tuned:
 
-            #     X = np.array(self.states_buffer)
-            #     Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
-            #     Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
-            #     Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
+                X = np.array(self.states_buffer)
+                Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
 
-            #     # print(Y1)
-            #     # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+                # print(Y1)
+                # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
 
-            #     self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
-            #     self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
-            #     self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel)            
+                self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
+                self.posterior1 = self.gp_model1.posterior()
 
 if __name__ == '__main__':
     try:
