@@ -10,9 +10,19 @@ from scipy.linalg import solve_continuous_are
 class GPFittingNode:
     def __init__(self):
 
-        self.buffer_size = 10
+        self.buffer_size = 50
+        self.tuning_buffer_size = 1000
+        self.skip = 0
+        self.skip_obs = 0
         # Buffers for states and observations
         self.states_buffer = []
+        
+        self.tuning_state_buffer = []
+        self.tuning_obs1_buffer = []
+        self.tuning_obs2_buffer = []
+        self.tuning_obs3_buffer = []
+
+
         self.observation1_buffer = []
         self.observation2_buffer = []
         self.observation3_buffer = []
@@ -22,12 +32,14 @@ class GPFittingNode:
         self.gp_model2 = None
         self.gp_model3 = None
 
+        self.tuned = False
+
         rospy.init_node('gp_fitting_node')
 
         print("Node started")
 
         # Subscribe to the topics for states and observations
-        rospy.Subscriber('states_topic', Float64MultiArray, self.states_callback)
+        rospy.Subscriber('states_topic', FloatArray, self.states_callback, queue_size=1)
         rospy.Subscriber('error_states', Float64MultiArray, self.errors_callback)
         rospy.Subscriber('observations_topic', Float64MultiArray, self.observations_callback)
 
@@ -39,7 +51,7 @@ class GPFittingNode:
         self.kernel = gpflow.kernels.RBF()
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(0.5), self.fit_gp)
+        rospy.Timer(rospy.Duration(0.4), self.fit_gp)
 
     def get_correction(self, mean1, mean2, mean3, var1, var2, var3, error):
 
@@ -69,7 +81,7 @@ class GPFittingNode:
         A[3:6, 0:3] = -K_P
         A[3:6, 3:6] = -K_D
         A[0:3, 3:6] = np.identity(3)
-        epsilon = 0.01
+        epsilon = 0.1
         Q = np.identity(6)
 
         P = solve_continuous_are(a = A, b = np.zeros([6, 6]), r = np.identity(6), q = Q)
@@ -80,7 +92,7 @@ class GPFittingNode:
         else:
             r = -rho * w/epsilon
 
-        print("r is: \n", r)
+        # print("r is: \n", r)
 
         return r
 
@@ -94,28 +106,46 @@ class GPFittingNode:
         else:
             self.states_buffer.append(msg.data)
 
-        if self.gp_model1 and self.gp_model2 and self.gp_model3:
+        self.skip = 0
+        if len(self.tuning_state_buffer)<self.tuning_buffer_size:
+            if self.skip%2 == 0:
+                self.tuning_state_buffer.append(msg.data)
+            self.skip+=1
+
+
+        if self.gp_model1 and self.gp_model2 and self.gp_model3 and self.tuned:
             data = np.expand_dims(np.array(msg.data), axis=0)
 
-            print("Data is: ", data)             
+            # print("Data is: ", data)             
             # print(data.shape)
+            time = msg.header.stamp
+            # print("\nStates being used to get prediction for observation: ", data)
 
             mean1, var1 = self.gp_model1.predict_f(data)
             mean2, var2 = self.gp_model2.predict_f(data)
             mean3, var3 = self.gp_model3.predict_f(data)
 
+            print("Time of publishing of this data is: ", time)
+            print("@@@@@@@@@@@@@@@@@@@@@@\n\n\n\n\n Prediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy(), "\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
+
+
             # print("\npredicted data is: ", mean1.numpy()[0][0])
             # Calculation of robust corrections
 
-            error = self.error_buffer[len(self.error_buffer)-1]
-            print("\nError is: ", error)
+            # error = self.error_buffer[len(self.error_buffer)-1]
+            # print("\nError is: ", error)
 
-            print("\nPrediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy(), var1.numpy(), var2.numpy(), var3.numpy())
+            # print("\nPrediction is: ", mean1.numpy(), mean2.numpy(), mean3.numpy())
+            # print("\Variance is: ", var1.numpy(), var2.numpy(), var3.numpy())
 
-            correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
+            # correction = self.get_correction(mean1, mean2, mean3, var1, var2, var3, error)
 
-            correction = correction.numpy()
-            correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
+            # correction = correction.numpy()
+            # correction_val = FloatArray(data = [correction[0][0], correction[0][1], correction[0][2]])
+            # correction_val.header.stamp = rospy.Time.now()
+            # correction_val.header.frame_id = 'GP Correction'
+
+            correction_val = FloatArray(data = [0, 0, 0])
             correction_val.header.stamp = rospy.Time.now()
             correction_val.header.frame_id = 'GP Correction'
 
@@ -129,6 +159,16 @@ class GPFittingNode:
     def observations_callback(self, msg):
 
         # print("Observation Callback")
+        print("Count is: \n", self.skip_obs)
+        print("Length of tuning_obs1_buffer: \n", len(self.tuning_obs1_buffer))
+        if len(self.tuning_obs1_buffer)<self.tuning_buffer_size:
+            if self.skip_obs%2 == 0:
+                self.tuning_obs1_buffer.append(msg.data[0])
+                self.tuning_obs2_buffer.append(msg.data[1])
+                self.tuning_obs3_buffer.append(msg.data[2])
+            self.skip_obs+=1
+
+        print("Offline data collected: ", skip_obs, "\n")
 
         if len(self.observation1_buffer) >= self.buffer_size:
             self.observation1_buffer.append(msg.data[0])
@@ -159,14 +199,15 @@ class GPFittingNode:
     def fit_gp(self, event):
 
         print("Calling fitting function")
-        if len(self.states_buffer) == self.buffer_size and len(self.observation1_buffer) > 0 and len(self.observation2_buffer) > 0 and len(self.observation3_buffer) > 0:
+        if len(self.tuning_obs1_buffer) == self.tuning_buffer_size and len(self.tuning_state_buffer) == self.tuning_buffer_size and not self.tuned:
             # X = np.array(self.states_buffer).reshape(-1, 1)
-            X = np.array(self.states_buffer)
-            Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
-            Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
-            Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
+            X = np.array(self.tuning_state_buffer)
+            Y1 = np.array(self.tuning_obs1_buffer).reshape(-1, 1)
+            Y2 = np.array(self.tuning_obs2_buffer).reshape(-1, 1)
+            Y3 = np.array(self.tuning_obs3_buffer).reshape(-1, 1)
 
             # print(Y1)
+            # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
 
             self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel)
             self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
@@ -178,8 +219,12 @@ class GPFittingNode:
             opt.minimize(self.gp_model2.training_loss, self.gp_model2.trainable_variables)
             opt.minimize(self.gp_model3.training_loss, self.gp_model3.trainable_variables)
 
-            self.states_buffer = []
-            self.observations_buffer = []
+            self.tuned = True
+
+            print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD \n\n\n\n")
+
+            # self.states_buffer = []
+            # self.observations_buffer = []
 
 if __name__ == '__main__':
     try:

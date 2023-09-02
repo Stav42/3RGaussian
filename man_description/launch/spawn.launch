@@ -28,6 +28,6 @@
         <node name="Manipulator_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
         args="-param robot_description -urdf -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -model 3r"/> 
 
-        <!-- <node name="GP_Predictions" pkg="man_controller" type="gp_node.py" output="screen"/>  -->
+        <node name="GP_Predictions" pkg="man_controller" type="gp_node.py" output="screen"/> 
 
 </launch>

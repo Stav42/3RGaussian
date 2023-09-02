@@ -42,6 +42,7 @@ namespace gazebo
       ros::Publisher error_publisher;
       ros::Publisher gp_state_publisher;
       ros::Publisher error_state_publisher;
+      ros::Publisher pred_error_publisher;
 
       ros::Publisher gp_observations_publisher;
 
@@ -105,7 +106,8 @@ namespace gazebo
       this->joint_pos_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_pos_publisher", 5);
       this->joint_vel_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_vel_publisher", 5);
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
-      this->gp_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/states_topic", 1);
+      this->gp_state_publisher = this->rosNode->advertise<man_controller::FloatArray>("/states_topic", 1);
+      this->pred_error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/pred_error", 1);
       
 
       this->gp_observations_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/observations_topic", 1);
@@ -127,7 +129,7 @@ namespace gazebo
       // joint4 = this->model->GetJoint("link_03_link_04");
 
       this->dt = 0.1;
-      std::cout<<"Works 1"<<std::endl;
+      // std::cout<<"Works 1"<<std::endl;
 
       state = Eigen::VectorXf::Zero(9);
       errors = Eigen::VectorXf::Zero(0);
@@ -188,10 +190,15 @@ namespace gazebo
       state(5) = this-> InvDyn.joint_vel(2);
       // std::cout<<"Checkpoint 2"<<std::endl;
       Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
-      std::cout<<"Commanded acc is: "<<eta_acc.transpose()<<std::endl;
+      // std::cout<<"Commanded acc is: "<<eta_acc.transpose()<<std::endl;
       state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
 
-      std_msgs::Float64MultiArray gp_state;
+      // std::cout<<"Sim Time: "<<ros::Time::now()<<std::endl;
+
+      man_controller::FloatArray gp_state;
+      gp_state.header.stamp = ros::Time::now();
+      gp_state.header.frame_id = "Please be right";
+
       for(int i=0; i<9;i++){
         gp_state.data.push_back(state(i));
       }
@@ -222,11 +229,11 @@ namespace gazebo
         gp3.add_data(state, obs(2));
       }
 
-      std::cout<<"Actual acc is: "<<this->InvDyn.joint_acc.transpose()<<std::endl;
+      // std::cout<<"Actual acc is: "<<this->InvDyn.joint_acc.transpose()<<std::endl;
 
       Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
       std_msgs::Float64MultiArray gp_obs;
-      std::cout<<"Eta is: "<<obs.transpose()<<std::endl;
+      // std::cout<<"Eta is: "<<obs.transpose()<<std::endl;
       for(int i=0; i<3;i++){
         gp_obs.data.push_back(obs(i));
       }
@@ -260,20 +267,29 @@ namespace gazebo
         mean(2) = gp3.mean;
         
       }
-      std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
+      // std::cout<<"Observation to learn is: "<<obs.transpose()<<std::endl;
+      // std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
+
+      man_controller::FloatValue pred_er = man_controller::FloatValue();
+
+      Eigen::VectorXf pred_err = gp_mean - obs;
+      pred_er.value = pred_err.norm();
+      this->pred_error_publisher.publish(pred_er);
+
+      // std::cout<<"States being published are: "<<state.transpose()<<std::endl;
       // std::cout<<"Torque correction is: "<<-1 * this->InvDyn.M * gp_mean<<std::endl;
       mean = Eigen::Vector3f::Zero();
       mean = gp_mean;
 
       gazebo::common::Time currentGzTime = this->model->GetWorld()->SimTime();
-      std::cout << "Gazebo Simulation Time: " << currentGzTime.Double() << " seconds" << std::endl;
+      // std::cout << "Gazebo Simulation Time: " << currentGzTime.Double() << " seconds" << std::endl;
 
       ros::Time currentROSTime = ros::Time::now();
-      std::cout << "ROS Time: " << currentROSTime.toSec() << " seconds" << std::endl;
+      // std::cout << "ROS Time: " << currentROSTime.toSec() << " seconds" << std::endl;
 
-      std::cout << "Prediction ROS Time:  "<<this->savedTimestamp.toSec() << " seconds "<<std::endl;
+      // std::cout << "Prediction ROS Time:  "<<this->savedTimestamp.toSec() << " seconds "<<std::endl;
 
-      std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
+      // std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       // corr = Eigen::Vector3f::Zero();
 
       bool hasNan = false;
@@ -289,9 +305,10 @@ namespace gazebo
       corr = Eigen::Vector3f::Zero();
 
       this->torque = this->InvDyn.get_total_torque(corr);
-      std::cout<<"Corr is: "<<corr.transpose()<<std::endl;
+      // std::cout<<"State input: "<<
+      // std::cout<<"Corr is: "<<corr.transpose()<<std::endl;
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
-      std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+      // std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
 
       man_controller::FloatValue err = man_controller::FloatValue();
 
@@ -306,7 +323,7 @@ namespace gazebo
 
       this->error_publisher.publish(err);
 
-      std::cout<<"Torque applied"<<this->torque<<std::endl;
+      // std::cout<<"Torque applied"<<this->torque<<std::endl;
       joint1->SetForce(0, torque[0]);
       joint2->SetForce(0, torque[1]);
       joint3->SetForce(0, torque[2]);

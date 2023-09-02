@@ -71,7 +71,21 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "span": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "any": "cpp",
+        "charconv": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "csignal": "cpp",
+        "coroutine": "cpp",
+        "fstream": "cpp",
+        "future": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "strstream": "cpp",
+        "typeindex": "cpp",
+        "algorithm": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/Users/stav.42/ws/devel/lib/python3.9/site-packages",
