@@ -33,11 +33,11 @@ def talker():
                 vel_msg = Traj(*vel_nums)
                 acc_msg = Traj(*acc_nums)
 
-                print("Publishing files")
+                # print("Publishing files")
                 pos_pub.publish(pos_msg)
                 vel_pub.publish(vel_msg)
                 acc_pub.publish(acc_msg)
-                print("Published")
+                # print("Published")
 
                 rate.sleep()
                 # else:

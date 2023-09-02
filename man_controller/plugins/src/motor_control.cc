@@ -43,6 +43,7 @@ namespace gazebo
       ros::Publisher gp_state_publisher;
       ros::Publisher error_state_publisher;
       ros::Publisher pred_error_publisher;
+      ros::Publisher training_data_publisher;
 
       ros::Publisher gp_observations_publisher;
 
@@ -70,8 +71,6 @@ namespace gazebo
 
       float accumulated_error = 0;
       int count_rms = 0;
-
-      gazebo::common::PID pid = gazebo::common::PID(1000000, 10, 10);
 
     public: ManipulatorPlugin() {
       if(!ros::isInitialized()){
@@ -108,9 +107,10 @@ namespace gazebo
       this->joint_acc_publisher = this->rosNode->advertise<man_controller::Traj>("/joint_acc_publisher", 5);
       this->gp_state_publisher = this->rosNode->advertise<man_controller::FloatArray>("/states_topic", 1);
       this->pred_error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/pred_error", 1);
-      
+      this->training_data_publisher = this->rosNode->advertise<man_controller::FloatArray>("/train_data", 1); 
 
-      this->gp_observations_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/observations_topic", 1);
+      // this->gp_observations_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/observations_topic", 1);
+      this->gp_observations_publisher = this->rosNode->advertise<man_controller::FloatArray>("/observations_topic", 1);
 
       this->error_publisher = this->rosNode->advertise<man_controller::FloatValue>("/error", 1);
 
@@ -203,11 +203,19 @@ namespace gazebo
         gp_state.data.push_back(state(i));
       }
 
+      man_controller::FloatArray training_data;
+      training_data.header.stamp = ros::Time::now();
+      training_data.header.frame_id = "Please be right";
+
+      for(int i=0; i<9;i++){
+        training_data.data.push_back(state(i));
+      }  
+
       Eigen::VectorXf error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
       Eigen::VectorXf error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_vel_ref;
       
 
-      std_msgs::Float64MultiArray error_state;
+      std_msgs::Float64MultiArray error_state;  
       for(int i=0; i<6;i++){
         if(i<3)
           error_state.data.push_back(error_state_gp(i));
@@ -218,24 +226,16 @@ namespace gazebo
       error_state_publisher.publish(error_state);
       gp_state_publisher.publish(gp_state);
 
-      if(count%10 == 0 && count>0){
-        // Eigen::VectorXf eta_acc = this-> InvDyn.joint_acc_ref + this-> InvDyn.KP * (this-> InvDyn.joint_pos_ref - this-> InvDyn.joint_pos)  + this-> InvDyn.KD * (this-> InvDyn.joint_vel_ref - this-> InvDyn.joint_vel);
-        // state(6) = eta_acc(0); state(7) = eta_acc(1); state(8) = eta_acc(2);
-
-        Eigen::VectorXf obs = this-> InvDyn.joint_acc - eta_acc;
-        // std::cout<<"Checkpoint 4"<<std::endl;
-        gp1.add_data(state, obs(0));
-        gp2.add_data(state, obs(1));
-        gp3.add_data(state, obs(2));
-      }
 
       // std::cout<<"Actual acc is: "<<this->InvDyn.joint_acc.transpose()<<std::endl;
 
       Eigen::VectorXf obs = this->InvDyn.joint_acc - eta_acc;
-      std_msgs::Float64MultiArray gp_obs;
+      man_controller::FloatArray gp_obs;
+      gp_obs.header.stamp = ros::Time::now();
       // std::cout<<"Eta is: "<<obs.transpose()<<std::endl;
       for(int i=0; i<3;i++){
         gp_obs.data.push_back(obs(i));
+        training_data.data.push_back(obs(i));
       }
 
       gp_observations_publisher.publish(gp_obs);
@@ -243,30 +243,6 @@ namespace gazebo
       Eigen::Vector3f mean;
       // mean = Eigen::Vector3f::Zero();
 
-      if(gp1.flag && gp2.flag && gp3.flag & !(count%10==0)){
-        // std::cout<<"State is: "<<state.transpose()<<std::endl;
-        // std::cout<<"K matrix"<<std::endl<<gp1.K<<std::endl;
-        Eigen::VectorXf result1 = gp1.get_prediction(state);
-        this->gp1.mean = result1(0);
-        this->gp1.std_dev = result1(1);
-
-        Eigen::VectorXf result2 = gp2.get_prediction(state);
-        this->gp2.mean = result2(0);
-        this->gp2.std_dev = result2(1);
-
-        Eigen::VectorXf result3 = gp3.get_prediction(state);
-        this->gp3.mean = result3(0);
-        this->gp3.std_dev = result3(1);
-
-        // std::cout<<"Estimate for 1: "<<this->gp1.mean<<std::endl;
-        // std::cout<<"Estimate for 2: "<<this->gp2.mean<<std::endl;
-        // std::cout<<"Estimate for 3: "<<this->gp3.mean<<std::endl;
-        
-        mean(0) = gp1.mean;
-        mean(1) = gp2.mean;
-        mean(2) = gp3.mean;
-        
-      }
       // std::cout<<"Observation to learn is: "<<obs.transpose()<<std::endl;
       // std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
 
@@ -317,7 +293,7 @@ namespace gazebo
       float err_norm = error.squaredNorm();
       accumulated_error += err_norm;
       count_rms += 1;
-
+      this->training_data_publisher.publish(training_data);
 
       err.value = err_norm;
 
