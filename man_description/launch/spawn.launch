@@ -29,10 +29,10 @@
         args="-param robot_description -urdf -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -model 3r"/> 
 
         <!-- <node name="GP_Predictions" pkg="man_controller" type="gp_node.py" output="screen"/>  -->
-        <node name="GP_Predictions1" pkg="man_controller" type="gp_node_0.py" output="screen"/> 
-        <node name="GP_Predictions2" pkg="man_controller" type="gp_node_1.py" output="screen"/> 
-        <node name="GP_Predictions3" pkg="man_controller" type="gp_node_2.py" output="screen"/> 
+        <!-- <node name="GP_Predictions1" pkg="man_controller" type="gp_node_0.py" output="screen"/> 
+        <node name="GP_Predictions2" pkg="man_controller" type="gp_node_1.py" output="screen"/>  -->
+        <!-- <node name="GP_Predictions3" pkg="man_controller" type="gp_node_2.py" output="screen"/>  -->
 
-        <node name="Reference_Trajectory" pkg="man_controller" type="reference_traj.py"/> 
+        <!-- <node name="Reference_Trajectory" pkg="man_controller" type="reference_traj.py"/>  -->
 
 </launch>

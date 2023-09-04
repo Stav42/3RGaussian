@@ -9,17 +9,20 @@ from man_controller.msg import FloatArray
 from gpflow.utilities import print_summary
 from scipy.linalg import solve_continuous_are
 import tensorflow as tf
+from sklearn.neighbors import KNeighborsClassifier
+
 
 class GPFittingNode:
     def __init__(self):
 
-        self.buffer_size = 50
+        self.buffer_size = 100
         self.tuning_buffer_size = 1000
         self.skip = 0
         self.skip_obs = 0
         # Buffers for states and observations
         self.states_buffer = []
-        
+        self.ranked_list = []
+
         self.tuning_state_buffer = []
         self.tuning_obs1_buffer = []
         self.tuning_obs_time_buffer = []
@@ -55,7 +58,7 @@ class GPFittingNode:
 
 
         # Timer for fitting GP at 10 Hz
-        rospy.Timer(rospy.Duration(0.4), self.fit_gp)
+        rospy.Timer(rospy.Duration(0.2), self.fit_gp)
 
     def get_correction(self, mean1, mean2, mean3, var1, var2, var3, error):
 
@@ -110,6 +113,14 @@ class GPFittingNode:
                 self.tuning_obs1_buffer.append(msg.data[11])
                 # self.tuning_state_time_buffer.append(msg.header.stamp)
             self.skip+=1
+        else:
+            if self.skip%20 == 0:
+                # print("Tuning happening for: ", msg.data[0])
+                self.tuning_state_buffer.append([msg.data[0],msg.data[1],msg.data[2],msg.data[3],msg.data[4],msg.data[5],msg.data[6],msg.data[7],msg.data[8] ] )
+                self.tuning_obs1_buffer.append(msg.data[9])
+                self.tuning_obs1_buffer.pop(0)
+                # self.tuning_state_time_buffer.append(msg.header.stamp)
+            self.skip+=1
         
         if len(self.observation1_buffer)>=self.buffer_size:
             self.observation1_buffer.append(msg.data[11])
@@ -119,7 +130,19 @@ class GPFittingNode:
         else:
             self.observation1_buffer.append(msg.data[11])
             self.states_buffer.append([msg.data[0],msg.data[1],msg.data[2],msg.data[3],msg.data[4],msg.data[5],msg.data[6],msg.data[7],msg.data[8] ] )
+        
 
+    def rank_states(datas, state):
+        
+        key_val = []
+        for i in range(datas.shape[0]):
+            dot = np.dot(datas[i], np.array(state))
+            key_val.append([dot, i])
+
+        key_val = np.array(key_val)
+        key_val[key_val[:, 0].argsort]
+
+        return key_val[:, 1]
 
 
     def states_callback(self, msg):
@@ -133,8 +156,16 @@ class GPFittingNode:
         #     self.states_buffer.append(msg.data)
         with tf.device("/cpu:0"):
 
+            start_time = pkg_time.time()
+            ranks = list(self.rank_states(np.array(self.tuning_state_buffer)))
+            
+
             if self.posterior1 and self.tuned:
-                data = np.expand_dims(np.array(msg.data), axis=0)
+                
+                ## Applying KNN
+                data = msg.data[ranks[0:50]]
+
+                data = np.expand_dims(np.array(data), axis=0)
  
 
                 # print("Data is: ", data.shape)             
@@ -148,7 +179,6 @@ class GPFittingNode:
                 # mean3, var3 = self.gp_model3.predict_f(data)
 
                 # print("Time taken to predict: ", start_time - pkg_time.time())
-                start_time = pkg_time.time()
                 mean11, var11 = self.posterior1.predict_f(data)
 
                 # print("Time taken to predict using posterior: ", pkg_time.time()-start_time)
@@ -227,7 +257,7 @@ class GPFittingNode:
 
     def fit_gp(self, event):
 
-        print("Calling fitting function")
+        print("Calling fitting function 3")
         # print("Time stamp of latest observation for GP1 input: \n", self.tuning_obs_time_buffer[len(self.tuning_obs_time_buffer)-1])
         # print("Time stamp of latest state for GP1 input: \n", self.tuning_state_time_buffer[len(self.tuning_state_time_buffer)-1])
         
@@ -236,8 +266,10 @@ class GPFittingNode:
 
             if len(self.tuning_obs1_buffer) == self.tuning_buffer_size and len(self.tuning_state_buffer) == self.tuning_buffer_size and not self.tuned:
                 # X = np.array(self.states_buffer).reshape(-1, 1)
-                X = np.array(self.tuning_state_buffer)
-                Y1 = np.array(self.tuning_obs1_buffer).reshape(-1, 1)
+                tuning_states = self.tuning_state_buffer[500:self.tuning_buffer_size-1]
+                X = np.array(tuning_states)
+                tuning_vals = self.tuning_obs1_buffer[500:self.tuning_buffer_size-1]
+                Y1 = np.array(tuning_vals).reshape(-1, 1)
 
                 # print(Y1)
                 # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
@@ -252,11 +284,11 @@ class GPFittingNode:
                 opt2 = gpflow.optimizers.Scipy()
                 opt3 = gpflow.optimizers.Scipy()
                 
-                # start_time = pkg_time.time()
+                start_time = pkg_time.time()
 
                 opt1.minimize(self.gp_model1.training_loss, self.gp_model1.trainable_variables)
 
-                # print("Time to optimize one gp model: ", start_time - pkg_time.time())
+                print("Time to optimize one gp model: ", start_time - pkg_time.time())
 
 
                 self.tuned = True
@@ -267,25 +299,25 @@ class GPFittingNode:
 
                 # self.posterior1 = self.gp_model1.posterior()
 
-                print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD \n\n\n\n")
+                print("YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYYYYYYYY \n\n\n\n TUNNNNNNNNNNEEEEEDDDDD 333333\n\n\n\n")
 
                 # self.states_buffer = []
                 # self.observations_buffer = []
 
-            if self.tuned:
+        if self.tuned:
 
-                X = np.array(self.states_buffer)
-                Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
-            #     Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
-            #     Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
+            X = np.array(self.states_buffer)
+            Y1 = np.array(self.observation1_buffer).reshape(-1, 1)
+        #     Y2 = np.array(self.observation2_buffer).reshape(-1, 1)
+        #     Y3 = np.array(self.observation3_buffer).reshape(-1, 1)
 
-            #     # print(Y1)
-            #     # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+        #     # print(Y1)
+        #     # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
 
-                self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
-                self.posterior1 = self.gp_model1.posterior()
-            #     self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
-            #     self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel)            
+            self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
+            self.posterior1 = self.gp_model1.posterior()
+        #     self.gp_model2 = gpflow.models.GPR(data=(X, Y2), kernel=self.kernel)
+        #     self.gp_model3 = gpflow.models.GPR(data=(X, Y3), kernel=self.kernel)            
 
 if __name__ == '__main__':
     try:
