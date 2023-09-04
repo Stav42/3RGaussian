@@ -9,7 +9,6 @@ from man_controller.msg import FloatArray
 from gpflow.utilities import print_summary
 from scipy.linalg import solve_continuous_are
 import tensorflow as tf
-from sklearn.neighbors import KNeighborsClassifier
 
 
 class GPFittingNode:
@@ -132,7 +131,7 @@ class GPFittingNode:
             self.states_buffer.append([msg.data[0],msg.data[1],msg.data[2],msg.data[3],msg.data[4],msg.data[5],msg.data[6],msg.data[7],msg.data[8] ] )
         
 
-    def rank_states(datas, state):
+    def rank_states(self, datas, state):
         
         key_val = []
         for i in range(datas.shape[0]):
@@ -140,8 +139,8 @@ class GPFittingNode:
             key_val.append([dot, i])
 
         key_val = np.array(key_val)
-        key_val[key_val[:, 0].argsort]
-
+        key_val = key_val[key_val[:, 0].argsort()]
+        print(key_val[:, 1])
         return key_val[:, 1]
 
 
@@ -157,16 +156,19 @@ class GPFittingNode:
         with tf.device("/cpu:0"):
 
             start_time = pkg_time.time()
-            ranks = list(self.rank_states(np.array(self.tuning_state_buffer)))
-            
+            data = np.expand_dims(np.array(msg.data), axis=0)
+            ranks = list(self.rank_states(np.array(self.tuning_state_buffer), np.array(msg.data)))
 
             if self.posterior1 and self.tuned:
-                
-                ## Applying KNN
-                data = msg.data[ranks[0:50]]
 
-                data = np.expand_dims(np.array(data), axis=0)
- 
+                X = np.array(self.tuning_state_buffer[ranks[0:50]])
+                Y1 = np.array(self.tuning_obs1_buffer[ranks[0:50]]).reshape(-1, 1)
+
+                # print(Y1)
+                # print("\Observation expected to learn: ", self.observation1_buffer, " ", self.observation2_buffer, " ", self.observation3_buffer)
+
+                self.gp_model1 = gpflow.models.GPR(data=(X, Y1), kernel=self.kernel1)
+                 
 
                 # print("Data is: ", data.shape)             
                 # print(data.shape)
@@ -179,7 +181,7 @@ class GPFittingNode:
                 # mean3, var3 = self.gp_model3.predict_f(data)
 
                 # print("Time taken to predict: ", start_time - pkg_time.time())
-                mean11, var11 = self.posterior1.predict_f(data)
+                mean11, var11 = self.gp_model1.predict_f(data)
 
                 # print("Time taken to predict using posterior: ", pkg_time.time()-start_time)
 
