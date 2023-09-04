@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-
         <!-- Robot Model-->
         <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find man_description)/urdf/manipulator.xacro'"/>
         <arg name="x_pos" default="0.0"/>
