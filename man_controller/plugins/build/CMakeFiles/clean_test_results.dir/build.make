@@ -44,10 +44,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /Users/stav.42/miniconda3/envs/ros/bin/cmake
+CMAKE_COMMAND = /Users/stav.42/miniconda3/envs/ros_new/bin/cmake
 
 # The command to remove a file.
-RM = /Users/stav.42/miniconda3/envs/ros/bin/cmake -E rm -f
+RM = /Users/stav.42/miniconda3/envs/ros_new/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -67,7 +67,7 @@ include CMakeFiles/clean_test_results.dir/compiler_depend.make
 include CMakeFiles/clean_test_results.dir/progress.make
 
 CMakeFiles/clean_test_results:
-	/Users/stav.42/miniconda3/envs/ros/bin/python3.9 /Users/stav.42/miniconda3/envs/ros/share/catkin/cmake/test/remove_test_results.py /Users/stav.42/ws/src/man_controller/plugins/build/test_results
+	/Users/stav.42/miniconda3/envs/ros_new/bin/python3.9 /Users/stav.42/miniconda3/envs/ros_new/share/catkin/cmake/test/remove_test_results.py /Users/stav.42/ws/src/man_controller/plugins/build/test_results
 
 clean_test_results: CMakeFiles/clean_test_results
 clean_test_results: CMakeFiles/clean_test_results.dir/build.make

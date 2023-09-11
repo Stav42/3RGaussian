@@ -294,19 +294,19 @@ namespace gazebo
       // std::cout<<"Current position: "<<std::endl<<this->InvDyn.joint_pos.transpose()<<std::endl;
       // corr = Eigen::Vector3f::Zero();
 
-      bool hasNan = false;
+      // bool hasNan = false;
       
-      for (int i = 0; i < corr.size(); ++i) {
-        if (std::isnan(corr[i])) {
-            hasNan = true;
-            break; // Exit the loop if a NaN is found
-        }
-      }
+      // for (int i = 0; i < corr.size(); ++i) {
+      //   if (std::isnan(corr[i])) {
+      //       hasNan = true;
+      //       break; // Exit the loop if a NaN is found
+      //   }
+      // }
 
-      if(hasNan)
+      // if(hasNan)
       // corr = Eigen::Vector3::Zero();
 
-      corr = this->get_corr(gp_mean(1), gp_mean(2), gp_mean(3), var1, var2, var3, error_calc);
+      corr = this->get_corr(gp_mean(0), gp_mean(1), gp_mean(2), var1, var2, var3, error_calc);
       std::cout<<"Correction is: "<<corr.transpose()<<std::endl;
 
       this->torque = this->InvDyn.get_total_torque(corr);
@@ -346,6 +346,9 @@ namespace gazebo
       double rho2 = std::max(abs(mean2 - 2.5*var2), abs(mean2 + 2.5*var2));
       double rho3 = std::max(abs(mean3 - 2.5*var3), abs(mean3 + 2.5*var3));
 
+      std::cout<<"Means are: "<< mean1<<" "<<mean2<<" "<<mean3<<std::endl;
+      std::cout<<"Vars are: "<< var1<<" "<<var2<<" "<<var3<<std::endl;
+
       double rho = rho1*rho1 + rho2*rho2 + rho3*rho3;
       rho = sqrt(rho);
 
@@ -359,10 +362,11 @@ namespace gazebo
 
       double epsilon = 0.1;
       Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(6, 6);
-      Eigen::MatrixXd R = Eigen::MatrixXd::Identity(6, 6);
+      Eigen::MatrixXd R = Eigen::MatrixXd::Identity(3, 3);
 
       Eigen::MatrixXd P;
-      P = drake::math::ContinuousAlgebraicRiccatiEquation(A, B, Q, R);
+      Eigen::MatrixXd B_tmp = Eigen::MatrixXd::Zero(6, 3);
+      P = drake::math::ContinuousAlgebraicRiccatiEquation(A, B_tmp, Q, R);
       Eigen::MatrixXd r;
 
       Eigen::MatrixXd w = B.transpose() * P * error;

@@ -6,13 +6,13 @@ import stat
 import sys
 
 # find the import for catkin's python package - either from source space or from an installed underlay
-if os.path.exists(os.path.join('/Users/stav.42/miniconda3/envs/ros/share/catkin/cmake', 'catkinConfig.cmake.in')):
-    sys.path.insert(0, os.path.join('/Users/stav.42/miniconda3/envs/ros/share/catkin/cmake', '..', 'python'))
+if os.path.exists(os.path.join('/Users/stav.42/miniconda3/envs/ros_new/share/catkin/cmake', 'catkinConfig.cmake.in')):
+    sys.path.insert(0, os.path.join('/Users/stav.42/miniconda3/envs/ros_new/share/catkin/cmake', '..', 'python'))
 try:
     from catkin.environment_cache import generate_environment_script
 except ImportError:
     # search for catkin package in all workspaces and prepend to path
-    for workspace in '/Users/stav.42/ws/devel;/Users/stav.42/miniconda3/envs/ros'.split(';'):
+    for workspace in '/Users/stav.42/ws/devel;/Users/stav.42/miniconda3/envs/ros_new'.split(';'):
         python_path = os.path.join(workspace, 'lib/python3.9/site-packages')
         if os.path.isdir(os.path.join(python_path, 'catkin')):
             sys.path.insert(0, python_path)
