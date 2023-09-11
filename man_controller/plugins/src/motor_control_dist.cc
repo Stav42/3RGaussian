@@ -8,10 +8,13 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <man_controller/FloatArray.h>
 #include <boost/bind.hpp>
+#include <algorithm>
+#include "drake/math/continuous_algebraic_riccati_equation.h"
 #include <gazebo/common/Time.hh>
 #include <gazebo/physics/physics.hh>
 #include "ff_torque.h"
 #include "gp.h"
+#include <cstdlib>
 
 namespace gazebo
 {
@@ -79,6 +82,9 @@ namespace gazebo
       Eigen::VectorXf gp_mean;
 
       Eigen::VectorXf corr;
+      float var1;
+      float var2;
+      float var3;
 
       // std::vector<float> gp_mean(3);
       // std::vector<float> gp_stddev(3);
@@ -111,12 +117,12 @@ namespace gazebo
       this->ref_pos_sub = this->rosNode->subscribe<man_controller::Traj>("/position_reference", 1, boost::bind(&ManipulatorPlugin::posCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_vel_sub = this->rosNode->subscribe<man_controller::Traj>("/velocity_reference", 1, boost::bind(&ManipulatorPlugin::velCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
       this->ref_acc_sub = this->rosNode->subscribe<man_controller::Traj>("/acceleration_reference", 1, boost::bind(&ManipulatorPlugin::accCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_pred1 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_predictions1", 1, boost::bind(&ManipulatorPlugin::pred1Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      // this->gp_corr1 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_corrections1", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_pred2 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_predictions2", 1, boost::bind(&ManipulatorPlugin::pred2Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      // this->gp_corr2 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_corrections2", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      this->gp_pred3 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_predictions3", 1, boost::bind(&ManipulatorPlugin::pred3Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
-      // this->gp_corr3 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_corrections4", 1, boost::bind(&ManipulatorPlugin::corrCallback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred1 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_mean1", 1, boost::bind(&ManipulatorPlugin::mean1Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_corr1 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_var1", 1, boost::bind(&ManipulatorPlugin::var1Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred2 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_mean2", 1, boost::bind(&ManipulatorPlugin::mean2Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_corr2 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_var2", 1, boost::bind(&ManipulatorPlugin::var2Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_pred3 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_mean3", 1, boost::bind(&ManipulatorPlugin::mean3Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
+      this->gp_corr3 = this->rosNode->subscribe<man_controller::FloatArray>("/gp_var3", 1, boost::bind(&ManipulatorPlugin::var3Callback, this, _1), ros::VoidPtr(), ros::TransportHints());
 
 
       this->error_state_publisher = this->rosNode->advertise<std_msgs::Float64MultiArray>("/error_states", 1);
@@ -227,7 +233,13 @@ namespace gazebo
 
       error_state_gp = this->InvDyn.joint_pos - this->InvDyn.joint_pos_ref;
       error_dot_state_gp = this->InvDyn.joint_vel - this->InvDyn.joint_vel_ref;
-      
+      Eigen::VectorXd error_calc = Eigen::VectorXd::Zero(6);
+      for(int i=0;i<6;i++){
+        if(i<3)
+        error_calc(i) = error_state_gp(i);
+        else
+        error_calc(i) = error_dot_state_gp(i-3); 
+      }
 
       error_state.data.clear();  
       for(int i=0; i<6;i++){
@@ -257,13 +269,13 @@ namespace gazebo
       Eigen::Vector3f mean;
       // mean = Eigen::Vector3f::Zero();
 
-      std::cout<<"Observation to learn is: "<<obs.transpose()<<std::endl;
-      std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
+      // std::cout<<"Observation to learn is: "<<obs.transpose()<<std::endl;
+      // std::cout<<"Prediction from GP: "<<gp_mean.transpose()<<std::endl;
 
       // man_controller::FloatValue pred_er 
 
       Eigen::VectorXf pred_err = gp_mean - obs;
-      pred_er.value = pred_err.norm();
+      pred_er.value = abs(pred_err.norm())/obs.norm();
       this->pred_error_publisher.publish(pred_er);
 
       // std::cout<<"States being published are: "<<state.transpose()<<std::endl;
@@ -292,13 +304,17 @@ namespace gazebo
       }
 
       if(hasNan)
-      corr = Eigen::Vector3f::Zero();
+      // corr = Eigen::Vector3::Zero();
+
+      corr = this->get_corr(gp_mean(1), gp_mean(2), gp_mean(3), var1, var2, var3, error_calc);
+      std::cout<<"Correction is: "<<corr.transpose()<<std::endl;
 
       this->torque = this->InvDyn.get_total_torque(corr);
       // std::cout<<"State input: "<<
       // std::cout<<"Corr is: "<<corr.transpose()<<std::endl;
       // std::cout<<"Torque being applied: "<<std::endl<<this->torque<< std::endl;
       // std::cout<<"Desired Position"<<std::endl<<this->InvDyn.joint_pos_ref.transpose()<< std::endl;
+
 
       man_controller::FloatValue err = man_controller::FloatValue();
 
@@ -325,34 +341,70 @@ namespace gazebo
       ros::spinOnce();
     }
 
-    public: void pred1Callback(const man_controller::FloatArray::ConstPtr &msg){
+    public: Eigen::VectorXf get_corr(float mean1, float mean2, float mean3, float var1, float var2, float var3, Eigen::VectorXd error){
+      double rho1 = std::max(abs(mean1 - 2.5*var1), abs(mean1 + 2.5*var1));
+      double rho2 = std::max(abs(mean2 - 2.5*var2), abs(mean2 + 2.5*var2));
+      double rho3 = std::max(abs(mean3 - 2.5*var3), abs(mean3 + 2.5*var3));
+
+      double rho = rho1*rho1 + rho2*rho2 + rho3*rho3;
+      rho = sqrt(rho);
+
+      Eigen::MatrixXd B = Eigen::MatrixXd::Zero(6, 3);
+      B.block(3, 0, 3, 3) = Eigen::MatrixXd::Identity(3, 3);
+
+      Eigen::MatrixXd A = Eigen::MatrixXd::Zero(6, 6);
+      A.block(3, 0, 3, 3) = -1 * this->InvDyn.KP.cast<double>();
+      A.block(3, 3, 3, 3) = -1 * this->InvDyn.KD.cast<double>();
+      A.block(0, 3, 3, 3) = Eigen::MatrixXd::Identity(3, 3);
+
+      double epsilon = 0.1;
+      Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(6, 6);
+      Eigen::MatrixXd R = Eigen::MatrixXd::Identity(6, 6);
+
+      Eigen::MatrixXd P;
+      P = drake::math::ContinuousAlgebraicRiccatiEquation(A, B, Q, R);
+      Eigen::MatrixXd r;
+
+      Eigen::MatrixXd w = B.transpose() * P * error;
+      if(w.norm()>epsilon)
+        r = -rho * w/w.norm();
+      else{
+        r = -rho * w/epsilon;
+      }
+
+
+      return r.cast<float>();
+
+    }
+
+    public: void mean1Callback(const man_controller::FloatArray::ConstPtr &msg){
       float mean1 = msg->data[0];
       // std::cout<<"GP1 prediction: "<<mean1<<std::endl;
       gp_mean(0) = mean1;
     }
 
-    public: void pred2Callback(const man_controller::FloatArray::ConstPtr &msg){
+    public: void mean2Callback(const man_controller::FloatArray::ConstPtr &msg){
       float mean2 = msg->data[0];
       // std::cout<<"GP2 prediction: "<<mean2<<std::endl;
       gp_mean(1) = mean2;
     }
 
-    public: void pred3Callback(const man_controller::FloatArray::ConstPtr &msg){
+    public: void mean3Callback(const man_controller::FloatArray::ConstPtr &msg){
       float mean3 = msg->data[0];
       // std::cout<<"GP3 prediction: "<<mean3<<std::endl;
       gp_mean(2) = mean3;
     }
 
-    public: void corrCallback(const man_controller::FloatArray::ConstPtr &msg){
-      float corr1 = msg->data[0];
-      float corr2 = msg->data[1];
-      float corr3 = msg->data[2];
-      
-      this->savedTimestamp = msg->header.stamp;
+    public: void var1Callback(const man_controller::FloatArray::ConstPtr &msg){
+      var1 = msg->data[0];
+    }
 
-      corr(0) = corr1;
-      corr(1) = corr2;
-      corr(2) = corr3;
+    public: void var2Callback(const man_controller::FloatArray::ConstPtr &msg){
+      var2 = msg->data[0];
+    }
+
+    public: void var3Callback(const man_controller::FloatArray::ConstPtr &msg){
+      var3 = msg->data[0];
     }
 
     public: void posCallback(const man_controller::Traj::ConstPtr& msg){
